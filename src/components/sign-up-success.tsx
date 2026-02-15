@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 export function SignUpSuccess() {
   const router = useRouter();
 
-  const navigateToLoginPage = () => {
-    router.push('/auth/login');
+  const navigateToSignInPage = () => {
+    router.push('/auth/sign-in');
   };
 
   return (
@@ -35,7 +35,7 @@ export function SignUpSuccess() {
               A confirmation email has been sent to your inbox. Please check your email and click the verification link
               to activate your account before signing in.
             </p>
-            <Button variant="default" className="w-full" onClick={navigateToLoginPage}>
+            <Button variant="default" className="w-full" onClick={navigateToSignInPage}>
               Back to Sign In
             </Button>
           </CardContent>

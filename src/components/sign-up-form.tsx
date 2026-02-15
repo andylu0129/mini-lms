@@ -34,22 +34,29 @@ export function SignUpForm() {
   };
 
   const handleSubmit = async (e: React.SubmitEvent) => {
+    if (isFormSubmitting) {
+      return;
+    }
+
     e.preventDefault();
     setError('');
     setIsFormSubmitting(true);
 
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       setError('Please fill in all fields.');
+      setIsFormSubmitting(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
+      setIsFormSubmitting(false);
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters.');
+      setIsFormSubmitting(false);
       return;
     }
 
@@ -65,8 +72,8 @@ export function SignUpForm() {
       if (success) {
         resetForm();
         setIsFormSubmitted(true);
-      } else if (error) {
-        setError(error);
+      } else {
+        setError(error || 'Sign up failed. Please try again.');
       }
     } catch (error) {
       console.error('Error signing up:', error);
@@ -105,7 +112,9 @@ export function SignUpForm() {
                     type="text"
                     placeholder="Jane"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    onChange={(e) => {
+                      setFirstName(e.target.value);
+                    }}
                     autoComplete="given-name"
                   />
                 </div>
@@ -116,7 +125,9 @@ export function SignUpForm() {
                     type="text"
                     placeholder="Doe"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    onChange={(e) => {
+                      setLastName(e.target.value);
+                    }}
                     autoComplete="family-name"
                   />
                 </div>
@@ -129,7 +140,9 @@ export function SignUpForm() {
                   type="email"
                   placeholder="student@university.edu"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
                   autoComplete="email"
                 />
               </div>
@@ -142,13 +155,17 @@ export function SignUpForm() {
                     type={showPassword ? 'text' : 'password'}
                     placeholder="At least 6 characters"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
                     autoComplete="new-password"
                     className="pr-10"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => {
+                      setShowPassword(!showPassword);
+                    }}
                     className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
@@ -164,23 +181,28 @@ export function SignUpForm() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Repeat your password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                  }}
                   autoComplete="new-password"
                 />
               </div>
 
-              <Button type="submit" className="mt-2 w-full">
+              <Button disabled={isFormSubmitting} type="submit" className="mt-2 w-full">
                 {isFormSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Account'}
               </Button>
 
               <p className="text-muted-foreground text-center text-sm">
                 {'Already have an account? '}
                 <button
+                  disabled={isFormSubmitting}
                   type="button"
-                  onClick={() => router.push('/auth/login')}
+                  onClick={() => {
+                    !isFormSubmitting && router.push('/auth/sign-in');
+                  }}
                   className="text-primary cursor-pointer font-medium underline-offset-4 hover:underline"
                 >
-                  Login
+                  Sign in
                 </button>
               </p>
             </form>

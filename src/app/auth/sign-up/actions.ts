@@ -1,6 +1,6 @@
-"use server";
+'use server';
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from '@/lib/supabase/server';
 
 export async function signUp({
   firstName,
@@ -22,7 +22,7 @@ export async function signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${origin}/auth/login`,
+        emailRedirectTo: `${origin}/auth/sign-in`,
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -38,7 +38,7 @@ export async function signUp({
   } catch (error: unknown) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An error occurred",
+      error: error instanceof Error ? error.message : 'An error occurred',
     };
   }
 }
