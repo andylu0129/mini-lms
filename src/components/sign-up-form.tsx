@@ -63,8 +63,8 @@ export function SignUpForm() {
       });
 
       if (success) {
-        setIsFormSubmitted(true);
         resetForm();
+        setIsFormSubmitted(true);
       } else if (error) {
         setError(error);
       }

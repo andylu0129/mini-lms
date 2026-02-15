@@ -1,5 +1,6 @@
 'use client';
 
+import { login } from '@/app/auth/login/actions';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
@@ -40,7 +41,14 @@ export function LoginForm() {
     }
 
     try {
-      // Implement login logic here.
+      const { success, error } = await login({ email, password });
+
+      if (success) {
+        resetForm();
+        router.push('/dashboard');
+      } else {
+        setError(error || 'Login failed. Please try again.');
+      }
     } catch (error) {
       console.error('Error logging in:', error);
     } finally {
@@ -95,7 +103,7 @@ export function LoginForm() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2"
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
