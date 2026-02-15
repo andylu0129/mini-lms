@@ -1,36 +1,161 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mini LMS
 
-## Getting Started
+## Table of Contents
 
-First, run the development server:
+- [Prerequisites](#prerequisites)
+  - [Node.js Setup](#nodejs-setup-if-not-using-docker)
+  - [Supabase Setup](#supabase-setup)
+  - [Docker Setup](#docker-setup)
+- [Running the Project](#running-the-project)
+  - [Using Docker](#using-docker)
+  - [Without Docker](#without-docker)
+- [Stopping the Project](#stopping-the-project)
+- [Deployed Version](#deployed-version)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Node.js Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This project requires **Node.js v20**. It is recommend to use [nvm](https://github.com/nvm-sh/nvm) to manage Node versions.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Install nvm**
 
-## Learn More
+   **macOS / Linux:**
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   **Windows:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   Download and install [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) from the latest release.
 
-## Deploy on Vercel
+2. **Install and use Node.js v20**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   **macOS / Linux:**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   nvm install 20
+   nvm use 20
+   ```
+
+   **Windows:**
+
+   ```powershell
+   nvm install 20
+   nvm use 20
+   ```
+
+3. **Verify the installation**
+
+   ```bash
+   node -v
+   ```
+
+   You should see a version starting with `v20`.
+
+### Supabase Setup
+
+1. **Install the Supabase CLI**
+
+   **Windows (via Scoop):**
+
+   If you don't have Scoop installed, run the following in PowerShell:
+
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+
+   # Reverts the execution policy back to its default.
+   Set-ExecutionPolicy -ExecutionPolicy Undefined -Scope CurrentUser
+   ```
+
+   Then install the Supabase CLI:
+
+   ```powershell
+   scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+   scoop install supabase
+   ```
+
+   **macOS / Linux (via Homebrew):**
+
+   ```bash
+   brew install supabase/tap/supabase
+   ```
+
+2. **Start Supabase**
+
+   ```bash
+   supabase start
+   ```
+
+3. **Reset the database** (applies migrations and seed data)
+
+   ```bash
+   supabase db reset
+   ```
+
+### Docker Setup
+
+1. **Install Docker Desktop and CLI**
+
+   Download and install from the official site: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+2. **Configure Docker Desktop settings** (Settings > General)
+
+   Enable the following options:
+   - **Expose daemon on tcp://localhost:2375 without TLS**
+   - **Use the WSL 2 based engine** (Windows Home can only run the WSL 2 backend)
+   - **Add the \*.docker.internal names to the host's /etc/hosts file** (requires password)
+
+## Running the Project
+
+### Using Docker Container
+
+1. Build and start the container:
+
+   ```bash
+   docker compose up --build
+   ```
+
+2. Access the app at [http://localhost:3000](http://localhost:3000)
+
+### Without Docker Container
+
+1. Install dependencies:
+
+   ```bash
+   npm ci
+   ```
+
+2. Build the app:
+
+   ```bash
+   npm run build
+   ```
+
+3. Start the server:
+
+   ```bash
+   npm start
+   ```
+
+4. Access the app at [http://localhost:3000](http://localhost:3000)
+
+## Stopping the Project
+
+- **Stop Supabase:**
+
+  ```bash
+  supabase stop
+  ```
+
+- **Stop the Docker container:**
+
+  ```bash
+  docker compose down
+  ```
+
+## Deployed Version
+
+[https://placeholder-url.com]()
