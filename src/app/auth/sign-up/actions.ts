@@ -7,11 +7,13 @@ export async function signUp({
   lastName,
   email,
   password,
+  origin,
 }: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
+  origin: string;
 }) {
   try {
     const supabase = await createClient();
@@ -20,6 +22,7 @@ export async function signUp({
       email,
       password,
       options: {
+        emailRedirectTo: `${origin}/auth/login`,
         data: {
           first_name: firstName,
           last_name: lastName,

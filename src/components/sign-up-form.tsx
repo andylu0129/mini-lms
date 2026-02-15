@@ -68,6 +68,7 @@ export function SignUpForm() {
         lastName: lastName,
         email: email,
         password: password,
+        origin: window.location.origin,
       });
 
       error && setError(error);
