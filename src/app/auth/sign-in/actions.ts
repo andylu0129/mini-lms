@@ -2,32 +2,13 @@
 
 import { createClient } from '@/lib/supabase/server';
 
-export async function signUp({
-  firstName,
-  lastName,
-  email,
-  password,
-  origin,
-}: {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  origin: string;
-}) {
+export async function SignIn({ email, password }: { email: string; password: string }) {
   try {
     const supabase = await createClient();
 
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      options: {
-        emailRedirectTo: `${origin}/auth/sign-in`,
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-        },
-      },
     });
 
     if (error) {
