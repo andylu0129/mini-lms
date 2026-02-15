@@ -3,9 +3,9 @@
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-  - [Node.js Setup](#nodejs-setup-if-not-using-docker)
-  - [Supabase Setup](#supabase-setup)
+  - [Node.js Setup](#nodejs-setup)
   - [Docker Setup](#docker-setup)
+  - [Supabase Setup](#supabase-setup)
 - [Running the Project](#running-the-project)
   - [Using Docker](#using-docker)
   - [Without Docker](#without-docker)
@@ -54,7 +54,22 @@ This project requires **Node.js v20**. It is recommend to use [nvm](https://gith
 
    You should see a version starting with `v20`.
 
+### Docker Setup
+
+1. **Install Docker Desktop and CLI**
+
+   Download and install from the official site: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+2. **Configure Docker Desktop settings** (Settings > General)
+
+   Enable the following options:
+   - **Expose daemon on tcp://localhost:2375 without TLS**
+   - **Use the WSL 2 based engine** (Windows Home can only run the WSL 2 backend)
+   - **Add the \*.docker.internal names to the host's /etc/hosts file** (requires password)
+
 ### Supabase Setup
+
+> **Note:** Supabase requires Docker to be installed and running.
 
 1. **Install the Supabase CLI**
 
@@ -94,19 +109,6 @@ This project requires **Node.js v20**. It is recommend to use [nvm](https://gith
    ```bash
    supabase db reset
    ```
-
-### Docker Setup
-
-1. **Install Docker Desktop and CLI**
-
-   Download and install from the official site: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-
-2. **Configure Docker Desktop settings** (Settings > General)
-
-   Enable the following options:
-   - **Expose daemon on tcp://localhost:2375 without TLS**
-   - **Use the WSL 2 based engine** (Windows Home can only run the WSL 2 backend)
-   - **Add the \*.docker.internal names to the host's /etc/hosts file** (requires password)
 
 ## Running the Project
 
