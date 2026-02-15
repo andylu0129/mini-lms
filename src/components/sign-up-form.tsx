@@ -33,11 +33,6 @@ export function SignUpForm() {
     setError('');
   };
 
-  const redirectToSuccessPage = () => {
-    resetForm();
-    router.push('/auth/sign-up/success');
-  };
-
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setError('');
@@ -67,8 +62,12 @@ export function SignUpForm() {
         origin: window.location.origin,
       });
 
-      error && setError(error);
-      success && setIsFormSubmitted(true);
+      if (success) {
+        setIsFormSubmitted(true);
+        resetForm();
+      } else if (error) {
+        setError(error);
+      }
     } catch (error) {
       console.error('Error signing up:', error);
     } finally {
@@ -173,6 +172,17 @@ export function SignUpForm() {
               <Button type="submit" className="mt-2 w-full">
                 {isFormSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Account'}
               </Button>
+
+              <p className="text-muted-foreground text-center text-sm">
+                {'Already have an account? '}
+                <button
+                  type="button"
+                  onClick={() => router.push('/auth/login')}
+                  className="text-primary cursor-pointer font-medium underline-offset-4 hover:underline"
+                >
+                  Login
+                </button>
+              </p>
             </form>
           </CardContent>
         </Card>
