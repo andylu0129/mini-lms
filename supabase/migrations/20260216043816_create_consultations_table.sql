@@ -30,3 +30,10 @@ on public.consultations
 for update
 using (user_id = auth.uid())
 with check (user_id = auth.uid());
+
+CREATE POLICY "Update is not allowed for consultations created_at column"
+ON public.consultations
+FOR UPDATE
+USING (
+  created_at = old.created_at
+);
