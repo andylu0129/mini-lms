@@ -19,7 +19,7 @@ export function SignUpSuccess() {
           <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-lg">
             <BookOpen className="text-primary-foreground h-6 w-6" />
           </div>
-          <h1 className="font-display text-foreground text-2xl font-bold">ConsultHub</h1>
+          <h1 className="font-display text-foreground text-2xl font-bold">MiniLMS</h1>
           <p className="text-muted-foreground text-sm">Student Consultation Portal</p>
         </div>
 
