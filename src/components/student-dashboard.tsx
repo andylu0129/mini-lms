@@ -2,6 +2,7 @@
 
 import { getConsultationList } from '@/app/(protected)/dashboard/actions';
 import { ConsultationCard } from '@/components/consultation-card';
+import { ConsultationCardSkeleton } from '@/components/consultation-card-skeleton';
 import { DashboardHeader } from '@/components/dashboard-header';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { ConsultationRowWithStatus } from '@/types/global';
@@ -54,7 +55,35 @@ export function StudentDashboard() {
         </div>
 
         {/* Consultation list */}
-        {consultationList.length === 0 && !shouldDisplayError ? (
+        {isLoading ? (
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <ConsultationCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : shouldDisplayError ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-yellow-300 bg-yellow-50 py-16 text-center dark:border-yellow-700 dark:bg-yellow-950">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900">
+              <TriangleAlert className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <h3 className="font-display text-lg font-semibold text-yellow-800 dark:text-yellow-200">
+              Something went wrong
+            </h3>
+            <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+              We couldn&apos;t load your consultations. Please try again.
+            </p>
+            <Button
+              onClick={() => {
+                handleGetConsultationList();
+              }}
+              className="mt-4 gap-2"
+              variant="outline"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Retry
+            </Button>
+          </div>
+        ) : consultationList.length === 0 ? (
           <div className="border-border flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
             <div className="bg-muted mb-4 flex h-12 w-12 items-center justify-center rounded-full">
               <Search className="text-muted-foreground h-5 w-5" />
@@ -68,23 +97,6 @@ export function StudentDashboard() {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-yellow-300 bg-yellow-50 py-16 text-center dark:border-yellow-700 dark:bg-yellow-950">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900">
-              <TriangleAlert className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-            </div>
-            <h3 className="font-display text-lg font-semibold text-yellow-800 dark:text-yellow-200">
-              Something went wrong
-            </h3>
-            <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
-              We couldn&apos;t load your consultations. Please try again.
-            </p>
-            <Button onClick={handleGetConsultationList} className="mt-4 gap-2" variant="outline">
-              <RefreshCw className="h-4 w-4" />
-              Retry
-            </Button>
-          </div>
-        )}
-        {consultationList.length > 0 && (
           <div className="flex flex-col gap-3">
             {consultationList.map((consultation) => (
               <ConsultationCard key={consultation.id} consultation={consultation} />

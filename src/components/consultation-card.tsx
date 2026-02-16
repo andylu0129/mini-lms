@@ -23,7 +23,7 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<ConsultationStatus | null>(null);
 
-  const dateObj = new Date(consultation.created_at);
+  const dateObj = new Date(consultation.scheduled_at);
   const formattedDate = moment(dateObj).format('DD MMM YYYY'); // e.g., 16 Feb 2026
   const formattedTime = moment(dateObj).format('hh:mm a'); // e.g., 08:45 pm
 
