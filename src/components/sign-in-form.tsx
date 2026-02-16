@@ -5,49 +5,47 @@ import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
 import { Label } from '@/lib/shadcn/components/ui/label';
+import { signInFormSchema } from '@/lib/zod/schemas/form-schema';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { BookOpen, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import z from 'zod';
+
+type SignInFormData = z.infer<typeof signInFormSchema>;
 
 export function SignInForm() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SignInFormData>({
+    resolver: zodResolver(signInFormSchema),
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   const resetForm = () => {
-    setEmail('');
-    setPassword('');
+    reset();
     setShowPassword(false);
     setError('');
   };
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleSignInSubmit = async (data: SignInFormData) => {
     if (isFormSubmitting) {
       return;
     }
 
-    e.preventDefault();
-    setError('');
     setIsFormSubmitting(true);
 
-    if (!email || !password) {
-      setError('Please fill in all fields.');
-      setIsFormSubmitting(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Invalid password.');
-      setIsFormSubmitting(false);
-      return;
-    }
-
     try {
-      const { success, error } = await SignIn({ email, password });
+      const { success, error } = await SignIn({ email: data.email, password: data.password });
 
       if (success) {
         resetForm();
@@ -59,6 +57,14 @@ export function SignInForm() {
       console.error('Error signing in:', error);
     } finally {
       setIsFormSubmitting(false);
+    }
+  };
+
+  const handleDisplayError = (errorObject: typeof errors) => {
+    if (errorObject.email) {
+      setError(errorObject.email.message || '');
+    } else if (errorObject.password) {
+      setError(errorObject.password.message || '');
     }
   };
 
@@ -79,7 +85,14 @@ export function SignInForm() {
             <CardDescription>Sign in to access your consultations</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form
+              onSubmit={(e) => {
+                handleSubmit(handleSignInSubmit, (errors) => {
+                  handleDisplayError(errors);
+                })(e);
+              }}
+              className="flex flex-col gap-4"
+            >
               {error && <div className="bg-destructive/10 text-destructive rounded-md px-4 py-3 text-sm">{error}</div>}
 
               <div className="flex flex-col gap-2">
@@ -87,12 +100,9 @@ export function SignInForm() {
                 <Input
                   id="sign-in-email"
                   type="email"
-                  placeholder="student@university.edu"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                  }}
+                  placeholder="email@example.com"
                   autoComplete="email"
+                  {...register('email')}
                 />
               </div>
 
@@ -103,12 +113,9 @@ export function SignInForm() {
                     id="sign-in-password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                    }}
                     autoComplete="current-password"
                     className="pr-10"
+                    {...register('password')}
                   />
                   <button
                     type="button"

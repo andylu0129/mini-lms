@@ -5,67 +5,54 @@ import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
 import { Label } from '@/lib/shadcn/components/ui/label';
+import { signUpFormSchema } from '@/lib/zod/schemas/form-schema';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { BookOpen, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import z from 'zod';
 import { SignUpSuccess } from './sign-up-success';
+
+type SignUpFormData = z.infer<typeof signUpFormSchema>;
 
 export function SignUpForm() {
   const router = useRouter();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpFormSchema),
+  });
+
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   const resetForm = () => {
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
+    reset();
     setShowPassword(false);
     setError('');
   };
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleSignUpSubmit = async (data: SignUpFormData) => {
     if (isFormSubmitting) {
       return;
     }
 
-    e.preventDefault();
-    setError('');
     setIsFormSubmitting(true);
-
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields.');
-      setIsFormSubmitting(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      setIsFormSubmitting(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      setIsFormSubmitting(false);
-      return;
-    }
 
     try {
       const { success, error } = await signUp({
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
         origin: window.location.origin,
       });
 
@@ -79,6 +66,20 @@ export function SignUpForm() {
       console.error('Error signing up:', error);
     } finally {
       setIsFormSubmitting(false);
+    }
+  };
+
+  const handleDisplayError = (errorObject: typeof errors) => {
+    if (errorObject.firstName) {
+      setError(errorObject.firstName.message || '');
+    } else if (errorObject.lastName) {
+      setError(errorObject.lastName.message || '');
+    } else if (errorObject.email) {
+      setError(errorObject.email.message || '');
+    } else if (errorObject.password) {
+      setError(errorObject.password.message || '');
+    } else if (errorObject.confirmPassword) {
+      setError(errorObject.confirmPassword.message || '');
     }
   };
 
@@ -101,8 +102,17 @@ export function SignUpForm() {
             <CardDescription>Get started with consultation management</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              {error && <div className="bg-destructive/10 text-destructive rounded-md px-4 py-3 text-sm">{error}</div>}
+            <form
+              onSubmit={(e) => {
+                handleSubmit(handleSignUpSubmit, (errors) => {
+                  handleDisplayError(errors);
+                })(e);
+              }}
+              className="flex flex-col gap-4"
+            >
+              {!!error.trim() && (
+                <div className="bg-destructive/10 text-destructive rounded-md px-4 py-3 text-sm">{error}</div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
@@ -110,12 +120,9 @@ export function SignUpForm() {
                   <Input
                     id="signup-first-name"
                     type="text"
-                    placeholder="Jane"
-                    value={firstName}
-                    onChange={(e) => {
-                      setFirstName(e.target.value);
-                    }}
+                    placeholder="First Name"
                     autoComplete="given-name"
+                    {...register('firstName')}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -123,12 +130,9 @@ export function SignUpForm() {
                   <Input
                     id="signup-last-name"
                     type="text"
-                    placeholder="Doe"
-                    value={lastName}
-                    onChange={(e) => {
-                      setLastName(e.target.value);
-                    }}
+                    placeholder="Last Name"
                     autoComplete="family-name"
+                    {...register('lastName')}
                   />
                 </div>
               </div>
@@ -138,12 +142,9 @@ export function SignUpForm() {
                 <Input
                   id="signup-email"
                   type="email"
-                  placeholder="student@university.edu"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                  }}
+                  placeholder="email@example.com"
                   autoComplete="email"
+                  {...register('email')}
                 />
               </div>
 
@@ -153,13 +154,10 @@ export function SignUpForm() {
                   <Input
                     id="signup-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="At least 6 characters"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                    }}
+                    placeholder="At least 8 characters"
                     autoComplete="new-password"
                     className="pr-10"
+                    {...register('password')}
                   />
                   <button
                     type="button"
@@ -176,16 +174,25 @@ export function SignUpForm() {
 
               <div className="flex flex-col gap-2">
                 <Label htmlFor="signup-confirm-password">Confirm Password</Label>
-                <Input
-                  id="signup-confirm-password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Repeat your password"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                  }}
-                  autoComplete="new-password"
-                />
+                <div className="relative">
+                  <Input
+                    id="signup-confirm-password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Repeat your password"
+                    autoComplete="new-password"
+                    {...register('confirmPassword')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowConfirmPassword(!showConfirmPassword);
+                    }}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  >
+                    {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
 
               <Button disabled={isFormSubmitting} type="submit" className="mt-2 w-full">
