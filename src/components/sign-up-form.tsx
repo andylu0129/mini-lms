@@ -142,7 +142,7 @@ export function SignUpForm() {
                 <Input
                   id="signup-email"
                   type="email"
-                  placeholder="student@university.edu"
+                  placeholder="email@example.com"
                   autoComplete="email"
                   {...register('email')}
                 />
