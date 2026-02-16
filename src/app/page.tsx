@@ -1,9 +1,5 @@
-"use client";
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <main className="min-h-screen w-full flex flex-col items-center ">
-      Home
-    </main>
-  );
+  redirect('/auth/sign-in');
 }
