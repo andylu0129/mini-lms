@@ -7,29 +7,94 @@ import { DashboardHeader } from '@/components/dashboard-header';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { ConsultationRowWithStatus } from '@/types/global';
 import { Plus, RefreshCw, Search, TriangleAlert } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function StudentDashboard() {
   const user = { firstName: 'John', lastName: 'Doe' };
 
+  const PAGE_SIZE = 5;
+
   const [consultationList, setConsultationList] = useState<ConsultationRowWithStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreItems, setHasMoreItems] = useState(false);
   const [shouldDisplayError, setShouldDisplayError] = useState(false);
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  // Stable ref so the IntersectionObserver callback always calls the latest loadMore
+  // without needing to re-create the observer on every render.
+  const loadMoreRef = useRef<() => void>(() => {});
 
   const handleGetConsultationList = async () => {
     try {
       setIsLoading(true);
+      setShouldDisplayError(false);
 
-      const { success, data } = await getConsultationList();
+      const { success, data, hasMore } = await getConsultationList(0, PAGE_SIZE);
 
       setConsultationList(data);
-      !success && setShouldDisplayError(true);
+      setHasMoreItems(hasMore);
+      if (!success) {
+        setShouldDisplayError(true);
+      }
     } catch (error) {
       console.error('Error getting consultation list:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const loadMore = useCallback(async () => {
+    try {
+      setIsLoadingMore(true);
+
+      const offset = consultationList.length;
+      const { success, data, hasMore } = await getConsultationList(offset, PAGE_SIZE);
+
+      if (success) {
+        setConsultationList((prev) => [...prev, ...data]);
+        setHasMoreItems(hasMore);
+      }
+    } catch (error) {
+      console.error('Error loading more consultations:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [consultationList.length]);
+
+  // Keep the ref in sync with the latest loadMore instance.
+  useEffect(() => {
+    loadMoreRef.current = loadMore;
+  }, [loadMore]);
+
+  // Callback ref attached to the last consultation card.
+  // When that element scrolls into view, it triggers the next page fetch.
+  const lastItemRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      // Don't set up a new observer while we're mid-fetch.
+      if (isLoadingMore) {
+        return;
+      }
+
+      // Tear down the old observer (was watching the previous last item).
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+
+      // Create a fresh observer.
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreItems) {
+          loadMoreRef.current();
+        }
+      });
+
+      // If React gave us a real node (not null), start watching it.
+      if (node) {
+        observerRef.current.observe(node);
+      }
+    },
+    [isLoadingMore, hasMoreItems],
+  );
 
   useEffect(() => {
     handleGetConsultationList();
@@ -98,9 +163,13 @@ export function StudentDashboard() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {consultationList.map((consultation) => (
-              <ConsultationCard key={consultation.id} consultation={consultation} />
+            {consultationList.map((consultation, index) => (
+              <div key={consultation.id} ref={index === consultationList.length - 1 ? lastItemRef : undefined}>
+                <ConsultationCard consultation={consultation} />
+              </div>
             ))}
+            {!!isLoadingMore &&
+              Array.from({ length: PAGE_SIZE }).map((_, i) => <ConsultationCardSkeleton key={`loading-more-${i}`} />)}
           </div>
         )}
       </main>
