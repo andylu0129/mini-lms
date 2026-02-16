@@ -88,17 +88,17 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
           <div className="flex flex-col gap-3">
             {/* Header section */}
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 shrink-0">{iconMap[consultationStatus]}</div>
+              <div className="mt-px shrink-0">{iconMap[consultationStatus]}</div>
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-start justify-between gap-2 space-x-2">
                   <h3
-                    className={`text-sm leading-snug font-semibold ${
+                    className={`min-w-0 flex-1 text-sm font-semibold text-wrap ${
                       consultationStatus === 'complete' ? 'text-muted-foreground line-through' : 'text-foreground'
                     }`}
                   >
                     {consultation.reason}
                   </h3>
-                  {badgeMap[consultationStatus]}
+                  <span className="flex shrink-0 items-start">{badgeMap[consultationStatus]}</span>
                 </div>
 
                 <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-xs">
