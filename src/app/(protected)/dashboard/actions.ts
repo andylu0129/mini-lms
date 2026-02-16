@@ -8,12 +8,12 @@ export async function getConsultationList(offset = 0, limit = 5) {
     const supabase = await createClient();
 
     const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-    const userId = session?.user?.id;
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
 
-    if (!userId || sessionError) {
+    if (!userId || userError) {
       return { success: false, data: [], hasMore: false };
     }
 
