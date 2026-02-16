@@ -5,7 +5,7 @@ create table public.consultations (
   last_name text not null,
   reason text not null,
   scheduled_at timestamptz not null,
-  is_completed boolean not null default false,
+  is_completed boolean,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -31,9 +31,16 @@ for update
 using (user_id = auth.uid())
 with check (user_id = auth.uid());
 
-CREATE POLICY "Update is not allowed for consultations created_at column"
-ON public.consultations
-FOR UPDATE
-USING (
-  created_at = old.created_at
-);
+-- Prevent created_at from being modified on update.
+create or replace function public.preserve_created_at()
+returns trigger as $$
+begin
+  new.created_at := old.created_at;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger trg_preserve_consultations_created_at
+before update on public.consultations
+for each row
+execute function public.preserve_created_at();
