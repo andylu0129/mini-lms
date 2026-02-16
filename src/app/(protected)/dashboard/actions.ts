@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { getDerivedConsultationStatus } from '@/utils/status-utils';
-import { redirect } from 'next/navigation';
 
 export async function getConsultationList(offset = 0, limit = 5) {
   try {
@@ -15,7 +14,7 @@ export async function getConsultationList(offset = 0, limit = 5) {
     const userId = session?.user?.id;
 
     if (!userId || sessionError) {
-      redirect('/auth/sign-in');
+      return { success: false, data: [], hasMore: false };
     }
 
     const { data, error } = await supabase
