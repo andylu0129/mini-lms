@@ -124,7 +124,7 @@ export type Database = {
         }[]
       }
       get_consultation_counts_by_status: {
-        Args: { user_uuid: string }
+        Args: { user_id: string }
         Returns: {
           complete_count: number
           incomplete_count: number
