@@ -39,7 +39,7 @@ export type Database = {
           created_at: string
           first_name: string
           id: string
-          is_completed: boolean
+          is_completed: boolean | null
           last_name: string
           reason: string
           scheduled_at: string
@@ -50,7 +50,7 @@ export type Database = {
           created_at?: string
           first_name: string
           id?: string
-          is_completed?: boolean
+          is_completed?: boolean | null
           last_name: string
           reason: string
           scheduled_at: string
@@ -61,7 +61,7 @@ export type Database = {
           created_at?: string
           first_name?: string
           id?: string
-          is_completed?: boolean
+          is_completed?: boolean | null
           last_name?: string
           reason?: string
           scheduled_at?: string
@@ -72,10 +72,73 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      consultations_with_status: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string | null
+          is_completed: boolean | null
+          last_name: string | null
+          reason: string | null
+          scheduled_at: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string | null
+          is_completed?: boolean | null
+          last_name?: string | null
+          reason?: string | null
+          scheduled_at?: string | null
+          status?: never
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: string | null
+          id?: string | null
+          is_completed?: boolean | null
+          last_name?: string | null
+          reason?: string | null
+          scheduled_at?: string | null
+          status?: never
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_consultation_counts: {
+        Args: { user_uuid: string }
+        Returns: {
+          complete_count: number
+          incomplete_count: number
+          pending_count: number
+          total_count: number
+          upcoming_count: number
+        }[]
+      }
+      get_consultation_counts_by_status: {
+        Args: { user_uuid: string }
+        Returns: {
+          complete_count: number
+          incomplete_count: number
+          pending_count: number
+          total_count: number
+          upcoming_count: number
+        }[]
+      }
+      get_consultation_status: {
+        Args: {
+          consultation: Database["public"]["Tables"]["consultations"]["Row"]
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

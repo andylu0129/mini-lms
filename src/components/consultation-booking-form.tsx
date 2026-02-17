@@ -68,12 +68,12 @@ export function ConsultationBookingForm() {
     setIsFormSubmitting(true);
 
     try {
-      const result = await createConsultation({
+      const { success } = await createConsultation({
         reason: data.reason,
         scheduled_at: data.scheduledAt.toISOString(),
       });
 
-      if (result.success) {
+      if (success) {
         setIsBookingSuccess(true);
         resetForm();
         setTimeout(() => {

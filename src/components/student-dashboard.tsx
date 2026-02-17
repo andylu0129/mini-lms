@@ -39,6 +39,7 @@ import { ConsultationActionType, ConsultationRowWithStatus } from '@/types/globa
 import { Loader2, Plus, RefreshCw, Search, TriangleAlert } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import DashboardStats from './dashboard-stats';
 
 const getActionModalContent = (actionType: ConsultationActionType | null) => {
   switch (actionType) {
@@ -133,9 +134,9 @@ export function StudentDashboard() {
     }
 
     try {
-      const result = await markConsultation({ id: consultationId, is_completed: isCompleted });
+      const { success } = await markConsultation({ id: consultationId, is_completed: isCompleted });
 
-      if (result.success) {
+      if (success) {
         setConsultationList((prev) => {
           return prev.map((item) => {
             return item.id === consultationId ? { ...item, status: actionType } : item;
@@ -235,6 +236,9 @@ export function StudentDashboard() {
           {TEXT_BOOK_CONSULTATION}
         </Button>
       </div>
+
+      {/* Stats */}
+      <DashboardStats />
 
       {/* Consultation list */}
       {isLoading ? (

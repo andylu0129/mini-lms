@@ -1,10 +1,13 @@
 'use server';
 
-import { TABLE_CONSULTATIONS } from '@/constants/common';
+import {
+  PL_PGSQL_GET_CONSULTATION_COUNTS_BY_STATUS,
+  TABLE_CONSULTATIONS,
+  VIEW_CONSULTATIONS_WITH_STATUS,
+} from '@/constants/common';
 import { clearAuthCookies, createClient, getVerifiedUserData } from '@/lib/supabase/server';
 import { ConsultationRow } from '@/types/global';
 import { rethrowRedirectError } from '@/utils/error-utils';
-import { getDerivedConsultationStatus } from '@/utils/status-utils';
 
 export async function signOut() {
   try {
@@ -24,7 +27,7 @@ export async function getConsultationList({ offset = 0, limit = 5 }: { offset: n
     const { userId } = await getVerifiedUserData();
 
     const { data, error } = await supabase
-      .from(TABLE_CONSULTATIONS)
+      .from(VIEW_CONSULTATIONS_WITH_STATUS)
       .select('*')
       .eq('user_id', userId)
       .order('scheduled_at', { ascending: false })
@@ -34,12 +37,8 @@ export async function getConsultationList({ offset = 0, limit = 5 }: { offset: n
       return { success: false, data: [], hasMore: false };
     }
 
-    const consultationList = data.map((consultation) => {
-      return { ...consultation, status: getDerivedConsultationStatus(consultation) };
-    });
-
     // If we got back exactly `limit` rows, there are likely more to fetch.
-    return { success: true, data: consultationList || [], hasMore: data.length === limit };
+    return { success: true, data: data || [], hasMore: data.length === limit };
   } catch (error) {
     rethrowRedirectError(error);
     return {
@@ -69,5 +68,23 @@ export async function markConsultation(data: Pick<ConsultationRow, 'id' | 'is_co
   } catch (error) {
     rethrowRedirectError(error);
     return { success: false };
+  }
+}
+
+export async function getConsultationStats() {
+  try {
+    const supabase = await createClient();
+    const { userId } = await getVerifiedUserData();
+
+    const { data, error } = await supabase.rpc(PL_PGSQL_GET_CONSULTATION_COUNTS_BY_STATUS, { user_id: userId });
+
+    if (error) {
+      return { success: false, data: [] };
+    }
+
+    return { success: true, data: data || [] };
+  } catch (error) {
+    rethrowRedirectError(error);
+    return { success: false, data: [] };
   }
 }
