@@ -19,8 +19,8 @@ export async function signUp({
     const supabase = await createClient();
 
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: email,
+      password: password,
       options: {
         emailRedirectTo: `${origin}/auth/sign-in`,
         data: {

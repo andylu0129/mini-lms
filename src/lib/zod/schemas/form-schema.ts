@@ -36,3 +36,10 @@ export const signInFormSchema = z.object({
       'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character',
     ),
 });
+
+export const consultationBookingFormSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  reason: z.string().min(1, 'Reason is required'),
+  scheduledAt: z.date().min(new Date(), 'Date must be in the future'),
+});

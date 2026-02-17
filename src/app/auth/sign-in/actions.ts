@@ -7,8 +7,8 @@ export async function SignIn({ email, password }: { email: string; password: str
     const supabase = await createClient();
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: email,
+      password: password,
     });
 
     if (error) {
