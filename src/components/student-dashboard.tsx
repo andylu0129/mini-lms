@@ -41,6 +41,7 @@ export function StudentDashboard() {
       }
     } catch (error) {
       console.error('Error getting consultation list:', error);
+      setShouldDisplayError(true);
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +64,7 @@ export function StudentDashboard() {
       }
     } catch (error) {
       console.error('Error loading more consultations:', error);
+      setShouldDisplayError(true);
     } finally {
       setIsLoadingMore(false);
     }

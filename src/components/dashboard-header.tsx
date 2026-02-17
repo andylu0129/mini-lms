@@ -1,15 +1,24 @@
 'use client';
 
+import { signOut } from '@/app/(protected)/dashboard/actions';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { BookOpen, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function DashboardHeader() {
+  const router = useRouter();
   const user = {
     firstName: 'John',
     lastName: 'Doe',
   };
-  const handleLogout = () => {
-    // TODO: Implement logout logic.
+
+  const handleLogout = async () => {
+    await signOut();
+
+    // Even if Supabase sign-out fails, cookies are cleared.
+    // Force-redirect since the user wants to leave.
+    new BroadcastChannel('auth').postMessage('sign-out');
+    router.push('/auth/sign-in');
   };
 
   return (

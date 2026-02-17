@@ -20,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Listen for future auth changes and redirect if session expires mid-browsing.
+    // Does not sign out other tabs and browsers.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
@@ -29,8 +30,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
+    // Listen for sign-out broadcasts from other tabs.
+    const channel = new BroadcastChannel('auth');
+    channel.onmessage = (event) => {
+      if (event.data === 'sign-out') {
+        setIsAuthenticated(false);
+        router.push('/auth/sign-in');
+      }
+    };
+
     return () => {
       subscription.unsubscribe();
+      channel.close();
     };
   }, [supabase, router]);
 

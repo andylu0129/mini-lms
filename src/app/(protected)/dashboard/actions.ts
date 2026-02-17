@@ -1,21 +1,25 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { clearAuthCookies, createClient, getAuthenticatedUserId } from '@/lib/supabase/server';
+import { rethrowRedirectError } from '@/utils/error-utils';
 import { getDerivedConsultationStatus } from '@/utils/status-utils';
+
+export async function signOut() {
+  try {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+
+    await clearAuthCookies();
+  } catch (error) {
+    // Clear auth cookies even if sign-out fails to prevent auto-authentication.
+    await clearAuthCookies();
+  }
+}
 
 export async function getConsultationList(offset = 0, limit = 5) {
   try {
     const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
-
-    if (!userId || userError) {
-      return { success: false, data: [], hasMore: false };
-    }
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('consultations')
@@ -35,6 +39,7 @@ export async function getConsultationList(offset = 0, limit = 5) {
     // If we got back exactly `limit` rows, there are likely more to fetch.
     return { success: true, data: consultationList || [], hasMore: data.length === limit };
   } catch (error) {
+    rethrowRedirectError(error);
     return {
       success: false,
       data: [],
@@ -51,16 +56,7 @@ export async function createConsultation(formData: {
 }) {
   try {
     const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
-
-    if (!userId || userError) {
-      return { success: false };
-    }
+    const userId = await getAuthenticatedUserId();
 
     const { error } = await supabase.from('consultations').insert({
       user_id: userId,
@@ -76,6 +72,7 @@ export async function createConsultation(formData: {
 
     return { success: true };
   } catch (error) {
+    rethrowRedirectError(error);
     return { success: false };
   }
 }
@@ -83,16 +80,7 @@ export async function createConsultation(formData: {
 export async function markConsultation(consultationId: string, isCompleted: boolean) {
   try {
     const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
-
-    if (!userId || userError) {
-      return { success: false };
-    }
+    const userId = await getAuthenticatedUserId();
 
     const { error } = await supabase
       .from('consultations')
@@ -106,6 +94,7 @@ export async function markConsultation(consultationId: string, isCompleted: bool
 
     return { success: true };
   } catch (error) {
+    rethrowRedirectError(error);
     return { success: false };
   }
 }
