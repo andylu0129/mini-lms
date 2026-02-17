@@ -2,6 +2,13 @@
 
 import { signUp } from '@/app/auth/sign-up/actions';
 import { ERROR_SIGN_UP_FAILED, TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
+import {
+  FIELD_CONFIRM_PASSWORD,
+  FIELD_EMAIL,
+  FIELD_FIRST_NAME,
+  FIELD_LAST_NAME,
+  FIELD_PASSWORD,
+} from '@/constants/fields';
 import { ROUTE_SIGN_IN } from '@/constants/routes';
 import {
   ARIA_HIDE_CONFIRM_PASSWORD,
@@ -72,10 +79,10 @@ export function SignUpForm() {
 
     try {
       const { success, error } = await signUp({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: data.password,
+        [FIELD_FIRST_NAME]: data[FIELD_FIRST_NAME],
+        [FIELD_LAST_NAME]: data[FIELD_LAST_NAME],
+        [FIELD_EMAIL]: data[FIELD_EMAIL],
+        [FIELD_PASSWORD]: data[FIELD_PASSWORD],
         origin: window.location.origin,
       });
 
@@ -93,23 +100,23 @@ export function SignUpForm() {
   };
 
   const handleDisplayError = (errorObject: typeof errors) => {
-    if (errorObject.firstName) {
-      setError(errorObject.firstName.message || '');
-    } else if (errorObject.lastName) {
-      setError(errorObject.lastName.message || '');
-    } else if (errorObject.email) {
-      setError(errorObject.email.message || '');
-    } else if (errorObject.password) {
-      setError(errorObject.password.message || '');
-    } else if (errorObject.confirmPassword) {
-      setError(errorObject.confirmPassword.message || '');
+    if (errorObject[FIELD_FIRST_NAME]) {
+      setError(errorObject[FIELD_FIRST_NAME].message || '');
+    } else if (errorObject[FIELD_LAST_NAME]) {
+      setError(errorObject[FIELD_LAST_NAME].message || '');
+    } else if (errorObject[FIELD_EMAIL]) {
+      setError(errorObject[FIELD_EMAIL].message || '');
+    } else if (errorObject[FIELD_PASSWORD]) {
+      setError(errorObject[FIELD_PASSWORD].message || '');
+    } else if (errorObject[FIELD_CONFIRM_PASSWORD]) {
+      setError(errorObject[FIELD_CONFIRM_PASSWORD].message || '');
     }
   };
 
   return isFormSubmitted ? (
     <SignUpSuccess />
   ) : (
-    <div className="bg-background flex min-h-screen items-center justify-center p-4">
+    <div className="bg-background items-top flex min-h-screen justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center gap-2">
           <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-lg">
@@ -145,7 +152,7 @@ export function SignUpForm() {
                     type="text"
                     placeholder={PLACEHOLDER_FIRST_NAME}
                     autoComplete="given-name"
-                    {...register('firstName')}
+                    {...register(FIELD_FIRST_NAME)}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -155,7 +162,7 @@ export function SignUpForm() {
                     type="text"
                     placeholder={PLACEHOLDER_LAST_NAME}
                     autoComplete="family-name"
-                    {...register('lastName')}
+                    {...register(FIELD_LAST_NAME)}
                   />
                 </div>
               </div>
@@ -167,7 +174,7 @@ export function SignUpForm() {
                   type="email"
                   placeholder={PLACEHOLDER_EMAIL}
                   autoComplete="email"
-                  {...register('email')}
+                  {...register(FIELD_EMAIL)}
                 />
               </div>
 
@@ -180,7 +187,7 @@ export function SignUpForm() {
                     placeholder={PLACEHOLDER_PASSWORD}
                     autoComplete="new-password"
                     className="pr-10"
-                    {...register('password')}
+                    {...register(FIELD_PASSWORD)}
                   />
                   <button
                     type="button"
@@ -203,7 +210,7 @@ export function SignUpForm() {
                     type={showConfirmPassword ? 'text' : 'password'}
                     placeholder={PLACEHOLDER_CONFIRM_PASSWORD}
                     autoComplete="new-password"
-                    {...register('confirmPassword')}
+                    {...register(FIELD_CONFIRM_PASSWORD)}
                   />
                   <button
                     type="button"

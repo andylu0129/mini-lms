@@ -1,3 +1,5 @@
+export const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_MAX_LENGTH = 64;
 export const VALIDATION_FIRST_NAME_REQUIRED = 'First name is required';
 export const VALIDATION_LAST_NAME_REQUIRED = 'Last name is required';
 export const VALIDATION_PASSWORD_MIN = 'Password must be at least 8 characters';

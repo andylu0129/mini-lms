@@ -4,6 +4,7 @@ import { createConsultation } from '@/app/(protected)/dashboard/consultation-boo
 import { ERROR_SOMETHING_WENT_WRONG, TEXT_BOOK_CONSULTATION, TEXT_CANCEL } from '@/constants/common';
 import {
   ARIA_BACK_TO_DASHBOARD,
+  BOOKING_SUCCESS_REDIRECT_DELAY_MS,
   HINT_DATETIME,
   HINT_REASON,
   LABEL_DATETIME,
@@ -19,6 +20,7 @@ import {
   TEXT_BOOKING_SUCCESS_TITLE,
   TEXT_BOOKING_TITLE,
 } from '@/constants/consultation-booking';
+import { FIELD_FIRST_NAME, FIELD_LAST_NAME, FIELD_REASON, FIELD_SCHEDULED_AT } from '@/constants/fields';
 import { ROUTE_DASHBOARD } from '@/constants/routes';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
@@ -69,8 +71,8 @@ export function ConsultationBookingForm() {
 
     try {
       const { success } = await createConsultation({
-        reason: data.reason,
-        scheduled_at: data.scheduledAt.toISOString(),
+        reason: data[FIELD_REASON],
+        scheduled_at: data[FIELD_SCHEDULED_AT].toISOString(),
       });
 
       if (success) {
@@ -78,7 +80,7 @@ export function ConsultationBookingForm() {
         resetForm();
         setTimeout(() => {
           handleBack();
-        }, 2000);
+        }, BOOKING_SUCCESS_REDIRECT_DELAY_MS);
       } else {
         setError(ERROR_SOMETHING_WENT_WRONG);
       }
@@ -91,10 +93,10 @@ export function ConsultationBookingForm() {
   }
 
   const handleDisplayError = (errorObject: typeof errors) => {
-    if (errorObject.reason) {
-      setError(errorObject.reason.message || '');
-    } else if (errorObject.scheduledAt) {
-      setError(errorObject.scheduledAt.message || '');
+    if (errorObject[FIELD_REASON]) {
+      setError(errorObject[FIELD_REASON].message || '');
+    } else if (errorObject[FIELD_SCHEDULED_AT]) {
+      setError(errorObject[FIELD_SCHEDULED_AT].message || '');
     }
   };
 
@@ -161,7 +163,7 @@ export function ConsultationBookingForm() {
                     placeholder={PLACEHOLDER_FIRST_NAME}
                     readOnly
                     disabled
-                    value={userDetails.firstName}
+                    value={userDetails[FIELD_FIRST_NAME]}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -172,7 +174,7 @@ export function ConsultationBookingForm() {
                     placeholder={PLACEHOLDER_LAST_NAME}
                     readOnly
                     disabled
-                    value={userDetails.lastName}
+                    value={userDetails[FIELD_LAST_NAME]}
                   />
                 </div>
               </div>
@@ -184,7 +186,7 @@ export function ConsultationBookingForm() {
                   placeholder={PLACEHOLDER_REASON}
                   rows={4}
                   className="resize-none"
-                  {...register('reason')}
+                  {...register(FIELD_REASON)}
                 />
                 <p className="text-muted-foreground text-xs">{HINT_REASON}</p>
               </div>
@@ -197,7 +199,7 @@ export function ConsultationBookingForm() {
                   min={moment().format('YYYY-MM-DDTHH:mm')}
                   max={moment().add(1, 'year').format('YYYY-MM-DDTHH:mm')}
                   className="[&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                  {...register('scheduledAt', { valueAsDate: true })}
+                  {...register(FIELD_SCHEDULED_AT, { valueAsDate: true })}
                 />
                 <p className="text-muted-foreground text-xs">{HINT_DATETIME}</p>
               </div>

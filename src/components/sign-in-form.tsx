@@ -2,6 +2,7 @@
 
 import { SignIn } from '@/app/auth/sign-in/actions';
 import { ERROR_SIGN_IN_FAILED, TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
+import { FIELD_EMAIL, FIELD_PASSWORD } from '@/constants/fields';
 import { ROUTE_DASHBOARD, ROUTE_SIGN_UP } from '@/constants/routes';
 import {
   ARIA_HIDE_PASSWORD,
@@ -60,7 +61,10 @@ export function SignInForm() {
     setIsFormSubmitting(true);
 
     try {
-      const { success, error } = await SignIn({ email: data.email, password: data.password });
+      const { success, error } = await SignIn({
+        [FIELD_EMAIL]: data[FIELD_EMAIL],
+        [FIELD_PASSWORD]: data[FIELD_PASSWORD],
+      });
 
       if (success) {
         resetForm();
@@ -76,15 +80,15 @@ export function SignInForm() {
   };
 
   const handleDisplayError = (errorObject: typeof errors) => {
-    if (errorObject.email) {
-      setError(errorObject.email.message || '');
-    } else if (errorObject.password) {
-      setError(errorObject.password.message || '');
+    if (errorObject[FIELD_EMAIL]) {
+      setError(errorObject[FIELD_EMAIL].message || '');
+    } else if (errorObject[FIELD_PASSWORD]) {
+      setError(errorObject[FIELD_PASSWORD].message || '');
     }
   };
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center px-4">
+    <div className="bg-background items-top flex min-h-screen justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center gap-2">
           <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-lg">
@@ -117,7 +121,7 @@ export function SignInForm() {
                   type="email"
                   placeholder={PLACEHOLDER_EMAIL}
                   autoComplete="email"
-                  {...register('email')}
+                  {...register(FIELD_EMAIL)}
                 />
               </div>
 
@@ -130,7 +134,7 @@ export function SignInForm() {
                     placeholder={PLACEHOLDER_PASSWORD}
                     autoComplete="current-password"
                     className="pr-10"
-                    {...register('password')}
+                    {...register(FIELD_PASSWORD)}
                   />
                   <button
                     type="button"

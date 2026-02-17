@@ -13,3 +13,4 @@ export const LABEL_LAST_NAME = 'Last Name';
 export const PLACEHOLDER_FIRST_NAME = 'First name';
 export const PLACEHOLDER_LAST_NAME = 'Last name';
 export const ARIA_BACK_TO_DASHBOARD = 'Back to dashboard';
+export const BOOKING_SUCCESS_REDIRECT_DELAY_MS = 2000;

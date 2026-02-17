@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 function CountingNumber({ value, isLoading }: { value?: number; isLoading: boolean }) {
   return (
     <span
-      className="transition-[--num] duration-[3s] ease-out [counter-set:num_var(--num)] supports-counter-set:before:content-[counter(num)]"
+      className="transition-[--num] duration-[2.5s] ease-out [counter-set:num_var(--num)] supports-counter-set:before:content-[counter(num)]"
       style={{ '--num': isLoading ? 0 : (value ?? 0) } as React.CSSProperties}
     >
       <span className="supports-counter-set:hidden">{isLoading ? 0 : (value ?? 0)}</span>
