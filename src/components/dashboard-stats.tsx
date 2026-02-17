@@ -4,42 +4,15 @@ import { getConsultationStats } from '@/app/(protected)/dashboard/actions';
 import { TEXT_TOTAL } from '@/constants/common';
 import { STATUS_COMPLETE, STATUS_INCOMPLETE, STATUS_PENDING, STATUS_UPCOMING } from '@/constants/status';
 import { ConsultationStatsData } from '@/types/global';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function CountingNumber({ value, isLoading }: { value?: number; isLoading: boolean }) {
-  const [loadingNum, setLoadingNum] = useState(0);
-  const counterRef = useRef(0);
-  const lastTimeRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (isLoading) {
-      const tick = (now: number) => {
-        if (now - lastTimeRef.current > 50) {
-          counterRef.current += 1;
-          setLoadingNum(counterRef.current);
-          lastTimeRef.current = now;
-        }
-        rafRef.current = requestAnimationFrame(tick);
-      };
-      rafRef.current = requestAnimationFrame(tick);
-    } else {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    }
-
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [isLoading]);
-
-  const num = isLoading ? loadingNum : (value ?? 0);
-
   return (
     <span
-      className="transition-[--num] duration-1000 ease-out [counter-set:num_var(--num)] supports-counter-set:before:content-[counter(num)]"
-      style={{ '--num': num } as React.CSSProperties}
+      className="transition-[--num] duration-[3s] ease-out [counter-set:num_var(--num)] supports-counter-set:before:content-[counter(num)]"
+      style={{ '--num': isLoading ? 0 : (value ?? 0) } as React.CSSProperties}
     >
-      <span className="supports-counter-set:hidden">{num}</span>
+      <span className="supports-counter-set:hidden">{isLoading ? 0 : (value ?? 0)}</span>
     </span>
   );
 }
