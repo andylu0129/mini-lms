@@ -19,12 +19,10 @@ export const COMMON_TEXT = {
   BOOK_CONSULTATION: 'Book Consultation',
   CANCEL: 'Cancel',
   SIGN_OUT: 'Sign Out',
-  TOTAL: 'total',
 } as const;
 
 export const DB = {
   TABLE_CONSULTATIONS: 'consultations',
   VIEW_CONSULTATIONS_WITH_STATUS: 'consultations_with_status',
-  PL_PGSQL_GET_CONSULTATION_COUNTS_BY_STATUS:
-    'get_consultation_counts_by_status',
+  PL_PGSQL_GET_CONSULTATION_COUNTS_BY_STATUS: 'get_consultation_counts_by_status',
 } as const;

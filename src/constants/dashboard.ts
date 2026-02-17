@@ -15,7 +15,9 @@ export const DASHBOARD = {
   },
   ERROR: {
     TITLE: 'Something went wrong',
-    DESCRIPTION:
-      "We couldn't load your consultations. Please try again.",
+    DESCRIPTION: "We couldn't load your consultations. Please try again.",
+  },
+  STATS: {
+    TOTAL: 'total',
   },
 } as const;

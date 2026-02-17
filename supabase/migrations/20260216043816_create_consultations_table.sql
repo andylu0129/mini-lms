@@ -67,20 +67,20 @@ from consultations;
 -- PL/pgSQL function to compute consultation counts based on status.
 create or replace function get_consultation_counts_by_status(user_id uuid)
 returns table(
-  total_count int,
-  complete_count int,
-  incomplete_count int,
-  upcoming_count int,
-  pending_count int
+  total int,
+  complete int,
+  incomplete int,
+  upcoming int,
+  pending int
 ) as $$
 begin
   return query
   select
-    count(*)::int as total_count,
-    count(*) filter (where get_consultation_status(consultation.*) = 'complete')::int as complete_count,
-    count(*) filter (where get_consultation_status(consultation.*) = 'incomplete')::int as incomplete_count,
-    count(*) filter (where get_consultation_status(consultation.*) = 'upcoming')::int as upcoming_count,
-    count(*) filter (where get_consultation_status(consultation.*) = 'pending')::int as pending_count
+    count(*)::int as total,
+    count(*) filter (where get_consultation_status(consultation.*) = 'complete')::int as complete,
+    count(*) filter (where get_consultation_status(consultation.*) = 'incomplete')::int as incomplete,
+    count(*) filter (where get_consultation_status(consultation.*) = 'upcoming')::int as upcoming,
+    count(*) filter (where get_consultation_status(consultation.*) = 'pending')::int as pending
   from consultations as consultation
   where consultation.user_id = get_consultation_counts_by_status.user_id;
 end;
