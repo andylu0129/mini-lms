@@ -1,5 +1,7 @@
-export const STATUS_ALL = 'all' as const;
-export const STATUS_UPCOMING = 'upcoming' as const;
-export const STATUS_PENDING = 'pending' as const;
-export const STATUS_COMPLETE = 'complete' as const;
-export const STATUS_INCOMPLETE = 'incomplete' as const;
+export const STATUS = {
+  ALL: 'all',
+  UPCOMING: 'upcoming',
+  PENDING: 'pending',
+  COMPLETE: 'complete',
+  INCOMPLETE: 'incomplete',
+} as const;

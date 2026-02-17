@@ -1,27 +1,10 @@
 'use client';
 
 import { createConsultation } from '@/app/(protected)/dashboard/consultation-booking/actions';
-import { ERROR_SOMETHING_WENT_WRONG, TEXT_BOOK_CONSULTATION, TEXT_CANCEL } from '@/constants/common';
-import {
-  ARIA_BACK_TO_DASHBOARD,
-  BOOKING_SUCCESS_REDIRECT_DELAY_MS,
-  HINT_DATETIME,
-  HINT_REASON,
-  LABEL_DATETIME,
-  LABEL_FIRST_NAME,
-  LABEL_LAST_NAME,
-  LABEL_REASON,
-  PLACEHOLDER_FIRST_NAME,
-  PLACEHOLDER_LAST_NAME,
-  PLACEHOLDER_REASON,
-  TEXT_BACK_TO_DASHBOARD,
-  TEXT_BOOKING_DESCRIPTION,
-  TEXT_BOOKING_SUCCESS_DESCRIPTION,
-  TEXT_BOOKING_SUCCESS_TITLE,
-  TEXT_BOOKING_TITLE,
-} from '@/constants/consultation-booking';
-import { FIELD_FIRST_NAME, FIELD_LAST_NAME, FIELD_REASON, FIELD_SCHEDULED_AT } from '@/constants/fields';
-import { ROUTE_DASHBOARD } from '@/constants/routes';
+import { COMMON_TEXT, ERRORS } from '@/constants/common';
+import { CONSULTATION_BOOKING } from '@/constants/consultation-booking';
+import { FIELDS } from '@/constants/fields';
+import { ROUTES } from '@/constants/routes';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
@@ -71,8 +54,8 @@ export function ConsultationBookingForm() {
 
     try {
       const { success } = await createConsultation({
-        reason: data[FIELD_REASON],
-        scheduled_at: data[FIELD_SCHEDULED_AT].toISOString(),
+        reason: data[FIELDS.REASON],
+        scheduled_at: data[FIELDS.SCHEDULED_AT].toISOString(),
       });
 
       if (success) {
@@ -80,35 +63,35 @@ export function ConsultationBookingForm() {
         resetForm();
         setTimeout(() => {
           handleBack();
-        }, BOOKING_SUCCESS_REDIRECT_DELAY_MS);
+        }, CONSULTATION_BOOKING.SUCCESS.REDIRECT_DELAY_MS);
       } else {
-        setError(ERROR_SOMETHING_WENT_WRONG);
+        setError(ERRORS.SOMETHING_WENT_WRONG);
       }
     } catch (error) {
       console.error('Error booking consultation:', error);
-      setError(ERROR_SOMETHING_WENT_WRONG);
+      setError(ERRORS.SOMETHING_WENT_WRONG);
     } finally {
       setIsFormSubmitting(false);
     }
   }
 
   const handleDisplayError = (errorObject: typeof errors) => {
-    if (errorObject[FIELD_REASON]) {
-      setError(errorObject[FIELD_REASON].message || '');
-    } else if (errorObject[FIELD_SCHEDULED_AT]) {
-      setError(errorObject[FIELD_SCHEDULED_AT].message || '');
+    if (errorObject[FIELDS.REASON]) {
+      setError(errorObject[FIELDS.REASON]?.message || '');
+    } else if (errorObject[FIELDS.SCHEDULED_AT]) {
+      setError(errorObject[FIELDS.SCHEDULED_AT]?.message || '');
     }
   };
 
   const handleBack = () => {
-    router.push(ROUTE_DASHBOARD);
+    router.push(ROUTES.DASHBOARD);
   };
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
       <button
         className="text-muted-foreground hover:text-foreground mb-6 flex cursor-pointer items-center gap-2 text-sm transition-colors"
-        aria-label={ARIA_BACK_TO_DASHBOARD}
+        aria-label={CONSULTATION_BOOKING.ARIA.BACK_TO_DASHBOARD}
         disabled={isFormSubmitting}
         onClick={() => {
           if (isFormSubmitting) {
@@ -119,7 +102,7 @@ export function ConsultationBookingForm() {
         }}
       >
         <ArrowLeft className="h-4 w-4" />
-        {TEXT_BACK_TO_DASHBOARD}
+        {CONSULTATION_BOOKING.BACK_TO_DASHBOARD}
       </button>
 
       <Card className="border-border shadow-lg">
@@ -129,8 +112,8 @@ export function ConsultationBookingForm() {
               <CalendarPlus className="text-primary h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="font-display text-xl">{TEXT_BOOKING_TITLE}</CardTitle>
-              <CardDescription>{TEXT_BOOKING_DESCRIPTION}</CardDescription>
+              <CardTitle className="font-display text-xl">{CONSULTATION_BOOKING.TITLE}</CardTitle>
+              <CardDescription>{CONSULTATION_BOOKING.DESCRIPTION}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -140,8 +123,10 @@ export function ConsultationBookingForm() {
               <div className="bg-primary/10 mb-4 flex h-14 w-14 items-center justify-center rounded-full">
                 <CalendarPlus className="text-primary h-7 w-7" />
               </div>
-              <h3 className="font-display text-foreground text-lg font-semibold">{TEXT_BOOKING_SUCCESS_TITLE}</h3>
-              <p className="text-muted-foreground mt-1 text-sm">{TEXT_BOOKING_SUCCESS_DESCRIPTION}</p>
+              <h3 className="font-display text-foreground text-lg font-semibold">
+                {CONSULTATION_BOOKING.SUCCESS.TITLE}
+              </h3>
+              <p className="text-muted-foreground mt-1 text-sm">{CONSULTATION_BOOKING.SUCCESS.DESCRIPTION}</p>
             </div>
           ) : (
             <form
@@ -156,52 +141,52 @@ export function ConsultationBookingForm() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="booking-first-name">{LABEL_FIRST_NAME}</Label>
+                  <Label htmlFor="booking-first-name">{CONSULTATION_BOOKING.LABEL.FIRST_NAME}</Label>
                   <Input
                     id="booking-first-name"
                     type="text"
-                    placeholder={PLACEHOLDER_FIRST_NAME}
+                    placeholder={CONSULTATION_BOOKING.PLACEHOLDER.FIRST_NAME}
                     readOnly
                     disabled
-                    value={userDetails[FIELD_FIRST_NAME]}
+                    value={userDetails[FIELDS.FIRST_NAME]}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="booking-last-name">{LABEL_LAST_NAME}</Label>
+                  <Label htmlFor="booking-last-name">{CONSULTATION_BOOKING.LABEL.LAST_NAME}</Label>
                   <Input
                     id="booking-last-name"
                     type="text"
-                    placeholder={PLACEHOLDER_LAST_NAME}
+                    placeholder={CONSULTATION_BOOKING.PLACEHOLDER.LAST_NAME}
                     readOnly
                     disabled
-                    value={userDetails[FIELD_LAST_NAME]}
+                    value={userDetails[FIELDS.LAST_NAME]}
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="booking-reason">{LABEL_REASON}</Label>
+                <Label htmlFor="booking-reason">{CONSULTATION_BOOKING.LABEL.REASON}</Label>
                 <Textarea
                   id="booking-reason"
-                  placeholder={PLACEHOLDER_REASON}
+                  placeholder={CONSULTATION_BOOKING.PLACEHOLDER.REASON}
                   rows={4}
                   className="resize-none"
-                  {...register(FIELD_REASON)}
+                  {...register(FIELDS.REASON)}
                 />
-                <p className="text-muted-foreground text-xs">{HINT_REASON}</p>
+                <p className="text-muted-foreground text-xs">{CONSULTATION_BOOKING.HINT.REASON}</p>
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="booking-datetime">{LABEL_DATETIME}</Label>
+                <Label htmlFor="booking-datetime">{CONSULTATION_BOOKING.LABEL.DATETIME}</Label>
                 <Input
                   id="booking-datetime"
                   type="datetime-local"
                   min={moment().format('YYYY-MM-DDTHH:mm')}
                   max={moment().add(1, 'year').format('YYYY-MM-DDTHH:mm')}
                   className="[&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                  {...register(FIELD_SCHEDULED_AT, { valueAsDate: true })}
+                  {...register(FIELDS.SCHEDULED_AT, { valueAsDate: true })}
                 />
-                <p className="text-muted-foreground text-xs">{HINT_DATETIME}</p>
+                <p className="text-muted-foreground text-xs">{CONSULTATION_BOOKING.HINT.DATETIME}</p>
               </div>
 
               <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
@@ -218,10 +203,14 @@ export function ConsultationBookingForm() {
                   }}
                   className="sm:order-1"
                 >
-                  {TEXT_CANCEL}
+                  {COMMON_TEXT.CANCEL}
                 </Button>
                 <Button type="submit" disabled={isFormSubmitting} className="gap-2 sm:order-2">
-                  {isFormSubmitting ? <Loader2 className="mx-12.75 h-4 w-4 animate-spin" /> : TEXT_BOOK_CONSULTATION}
+                  {isFormSubmitting ? (
+                    <Loader2 className="mx-12.75 h-4 w-4 animate-spin" />
+                  ) : (
+                    COMMON_TEXT.BOOK_CONSULTATION
+                  )}
                 </Button>
               </div>
             </form>

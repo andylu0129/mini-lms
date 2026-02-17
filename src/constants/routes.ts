@@ -1,6 +1,8 @@
-export const ROUTE_AUTH = '/auth';
-export const ROUTE_SIGN_IN_PATH = '/sign-in';
-export const ROUTE_SIGN_IN = `${ROUTE_AUTH}${ROUTE_SIGN_IN_PATH}`;
-export const ROUTE_SIGN_UP = `${ROUTE_AUTH}/sign-up`;
-export const ROUTE_DASHBOARD = '/dashboard';
-export const ROUTE_CONSULTATION_BOOKING = `${ROUTE_DASHBOARD}/consultation-booking`;
+export const ROUTES = {
+  AUTH: '/auth',
+  SIGN_IN_PATH: '/sign-in',
+  SIGN_IN: '/auth/sign-in',
+  SIGN_UP: '/auth/sign-up',
+  DASHBOARD: '/dashboard',
+  CONSULTATION_BOOKING: '/dashboard/consultation-booking',
+} as const;

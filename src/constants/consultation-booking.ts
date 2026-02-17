@@ -1,16 +1,28 @@
-export const TEXT_BACK_TO_DASHBOARD = 'Back to Dashboard';
-export const TEXT_BOOKING_TITLE = 'Book a Consultation';
-export const TEXT_BOOKING_DESCRIPTION = 'Fill out the details below to schedule a new session';
-export const TEXT_BOOKING_SUCCESS_TITLE = 'Consultation Booked';
-export const TEXT_BOOKING_SUCCESS_DESCRIPTION = 'Redirecting to your dashboard...';
-export const LABEL_REASON = 'Reason for Consultation';
-export const LABEL_DATETIME = 'Date and Time';
-export const PLACEHOLDER_REASON = 'Describe the purpose of your consultation...';
-export const HINT_REASON = 'Provide a brief description so the advisor can prepare.';
-export const HINT_DATETIME = 'Choose a date and time that works for you.';
-export const LABEL_FIRST_NAME = 'First Name';
-export const LABEL_LAST_NAME = 'Last Name';
-export const PLACEHOLDER_FIRST_NAME = 'First name';
-export const PLACEHOLDER_LAST_NAME = 'Last name';
-export const ARIA_BACK_TO_DASHBOARD = 'Back to dashboard';
-export const BOOKING_SUCCESS_REDIRECT_DELAY_MS = 2000;
+export const CONSULTATION_BOOKING = {
+  TITLE: 'Book a Consultation',
+  DESCRIPTION: 'Fill out the details below to schedule a new session',
+  BACK_TO_DASHBOARD: 'Back to Dashboard',
+  SUCCESS: {
+    TITLE: 'Consultation Booked',
+    DESCRIPTION: 'Redirecting to your dashboard...',
+    REDIRECT_DELAY_MS: 2000,
+  },
+  LABEL: {
+    REASON: 'Reason for Consultation',
+    DATETIME: 'Date and Time',
+    FIRST_NAME: 'First Name',
+    LAST_NAME: 'Last Name',
+  },
+  PLACEHOLDER: {
+    REASON: 'Describe the purpose of your consultation...',
+    FIRST_NAME: 'First name',
+    LAST_NAME: 'Last name',
+  },
+  HINT: {
+    REASON: 'Provide a brief description so the advisor can prepare.',
+    DATETIME: 'Choose a date and time that works for you.',
+  },
+  ARIA: {
+    BACK_TO_DASHBOARD: 'Back to dashboard',
+  },
+} as const;

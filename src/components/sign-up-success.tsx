@@ -1,12 +1,8 @@
 'use client';
 
-import { TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
-import { ROUTE_SIGN_IN } from '@/constants/routes';
-import {
-  TEXT_ACCOUNT_CREATED_DESCRIPTION,
-  TEXT_ACCOUNT_CREATED_TITLE,
-  TEXT_BACK_TO_SIGN_IN,
-} from '@/constants/sign-up';
+import { APP } from '@/constants/common';
+import { ROUTES } from '@/constants/routes';
+import { SIGN_UP_TEXT } from '@/constants/sign-up';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { BookOpen, MailCheck } from 'lucide-react';
@@ -16,7 +12,7 @@ export function SignUpSuccess() {
   const router = useRouter();
 
   const navigateToSignInPage = () => {
-    router.push(ROUTE_SIGN_IN);
+    router.push(ROUTES.SIGN_IN);
   };
 
   return (
@@ -26,8 +22,8 @@ export function SignUpSuccess() {
           <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-lg">
             <BookOpen className="text-primary-foreground h-6 w-6" />
           </div>
-          <h1 className="font-display text-foreground text-2xl font-bold">{TEXT_APP_NAME}</h1>
-          <p className="text-muted-foreground text-sm">{TEXT_APP_TAGLINE}</p>
+          <h1 className="font-display text-foreground text-2xl font-bold">{APP.NAME}</h1>
+          <p className="text-muted-foreground text-sm">{APP.TAGLINE}</p>
         </div>
 
         <Card className="border-border shadow-lg">
@@ -35,14 +31,14 @@ export function SignUpSuccess() {
             <div className="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-full">
               <MailCheck className="text-primary h-7 w-7" />
             </div>
-            <CardTitle className="font-display text-xl">{TEXT_ACCOUNT_CREATED_TITLE}</CardTitle>
+            <CardTitle className="font-display text-xl">{SIGN_UP_TEXT.SUCCESS.TITLE}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-6 px-6 pt-2 pb-8 text-center">
             <p className="text-muted-foreground text-sm leading-relaxed">
-              {TEXT_ACCOUNT_CREATED_DESCRIPTION}
+              {SIGN_UP_TEXT.SUCCESS.DESCRIPTION}
             </p>
             <Button variant="default" className="w-full" onClick={navigateToSignInPage}>
-              {TEXT_BACK_TO_SIGN_IN}
+              {SIGN_UP_TEXT.SUCCESS.BACK_TO_SIGN_IN}
             </Button>
           </CardContent>
         </Card>

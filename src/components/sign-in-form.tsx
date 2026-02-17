@@ -1,22 +1,10 @@
 'use client';
 
 import { SignIn } from '@/app/auth/sign-in/actions';
-import { ERROR_SIGN_IN_FAILED, TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
-import { FIELD_EMAIL, FIELD_PASSWORD } from '@/constants/fields';
-import { ROUTE_DASHBOARD, ROUTE_SIGN_UP } from '@/constants/routes';
-import {
-  ARIA_HIDE_PASSWORD,
-  ARIA_SHOW_PASSWORD,
-  LABEL_EMAIL,
-  LABEL_PASSWORD,
-  PLACEHOLDER_EMAIL,
-  PLACEHOLDER_PASSWORD,
-  TEXT_CREATE_ONE,
-  TEXT_NO_ACCOUNT_PROMPT,
-  TEXT_SIGN_IN,
-  TEXT_SIGN_IN_DESCRIPTION,
-  TEXT_WELCOME_BACK,
-} from '@/constants/sign-in';
+import { APP, ERRORS } from '@/constants/common';
+import { FIELDS } from '@/constants/fields';
+import { ROUTES } from '@/constants/routes';
+import { SIGN_IN_TEXT } from '@/constants/sign-in';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
@@ -62,15 +50,15 @@ export function SignInForm() {
 
     try {
       const { success, error } = await SignIn({
-        [FIELD_EMAIL]: data[FIELD_EMAIL],
-        [FIELD_PASSWORD]: data[FIELD_PASSWORD],
+        [FIELDS.EMAIL]: data[FIELDS.EMAIL],
+        [FIELDS.PASSWORD]: data[FIELDS.PASSWORD],
       });
 
       if (success) {
         resetForm();
-        router.push(ROUTE_DASHBOARD);
+        router.push(ROUTES.DASHBOARD);
       } else {
-        setError(error || ERROR_SIGN_IN_FAILED);
+        setError(error || ERRORS.SIGN_IN_FAILED);
       }
     } catch (error) {
       console.error('Error signing in:', error);
@@ -80,10 +68,10 @@ export function SignInForm() {
   };
 
   const handleDisplayError = (errorObject: typeof errors) => {
-    if (errorObject[FIELD_EMAIL]) {
-      setError(errorObject[FIELD_EMAIL].message || '');
-    } else if (errorObject[FIELD_PASSWORD]) {
-      setError(errorObject[FIELD_PASSWORD].message || '');
+    if (errorObject[FIELDS.EMAIL]) {
+      setError(errorObject[FIELDS.EMAIL]?.message || '');
+    } else if (errorObject[FIELDS.PASSWORD]) {
+      setError(errorObject[FIELDS.PASSWORD]?.message || '');
     }
   };
 
@@ -94,14 +82,14 @@ export function SignInForm() {
           <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-lg">
             <BookOpen className="text-primary-foreground h-6 w-6" />
           </div>
-          <h1 className="font-display text-foreground text-2xl font-bold">{TEXT_APP_NAME}</h1>
-          <p className="text-muted-foreground text-sm">{TEXT_APP_TAGLINE}</p>
+          <h1 className="font-display text-foreground text-2xl font-bold">{APP.NAME}</h1>
+          <p className="text-muted-foreground text-sm">{APP.TAGLINE}</p>
         </div>
 
         <Card className="border-border shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="font-display text-xl">{TEXT_WELCOME_BACK}</CardTitle>
-            <CardDescription>{TEXT_SIGN_IN_DESCRIPTION}</CardDescription>
+            <CardTitle className="font-display text-xl">{SIGN_IN_TEXT.TITLE}</CardTitle>
+            <CardDescription>{SIGN_IN_TEXT.DESCRIPTION}</CardDescription>
           </CardHeader>
           <CardContent>
             <form
@@ -115,26 +103,26 @@ export function SignInForm() {
               {error && <div className="bg-destructive/10 text-destructive rounded-md px-4 py-3 text-sm">{error}</div>}
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="sign-in-email">{LABEL_EMAIL}</Label>
+                <Label htmlFor="sign-in-email">{SIGN_IN_TEXT.LABEL.EMAIL}</Label>
                 <Input
                   id="sign-in-email"
                   type="email"
-                  placeholder={PLACEHOLDER_EMAIL}
+                  placeholder={SIGN_IN_TEXT.PLACEHOLDER.EMAIL}
                   autoComplete="email"
-                  {...register(FIELD_EMAIL)}
+                  {...register(FIELDS.EMAIL)}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="sign-in-password">{LABEL_PASSWORD}</Label>
+                <Label htmlFor="sign-in-password">{SIGN_IN_TEXT.LABEL.PASSWORD}</Label>
                 <div className="relative">
                   <Input
                     id="sign-in-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder={PLACEHOLDER_PASSWORD}
+                    placeholder={SIGN_IN_TEXT.PLACEHOLDER.PASSWORD}
                     autoComplete="current-password"
                     className="pr-10"
-                    {...register(FIELD_PASSWORD)}
+                    {...register(FIELDS.PASSWORD)}
                   />
                   <button
                     type="button"
@@ -142,7 +130,7 @@ export function SignInForm() {
                       setShowPassword(!showPassword);
                     }}
                     className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
-                    aria-label={showPassword ? ARIA_HIDE_PASSWORD : ARIA_SHOW_PASSWORD}
+                    aria-label={showPassword ? SIGN_IN_TEXT.ARIA.HIDE_PASSWORD : SIGN_IN_TEXT.ARIA.SHOW_PASSWORD}
                   >
                     {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
@@ -150,20 +138,20 @@ export function SignInForm() {
               </div>
 
               <Button disabled={isFormSubmitting} type="submit" className="mt-2 w-full">
-                {isFormSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : TEXT_SIGN_IN}
+                {isFormSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : SIGN_IN_TEXT.SUBMIT}
               </Button>
 
               <p className="text-muted-foreground text-center text-sm">
-                {TEXT_NO_ACCOUNT_PROMPT}
+                {SIGN_IN_TEXT.NO_ACCOUNT_PROMPT}
                 <button
                   disabled={isFormSubmitting}
                   type="button"
                   onClick={() => {
-                    !isFormSubmitting && router.push(ROUTE_SIGN_UP);
+                    !isFormSubmitting && router.push(ROUTES.SIGN_UP);
                   }}
                   className="text-primary cursor-pointer font-medium underline-offset-4 hover:underline"
                 >
-                  {TEXT_CREATE_ONE}
+                  {SIGN_IN_TEXT.CREATE_ONE}
                 </button>
               </p>
             </form>
