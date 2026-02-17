@@ -1,6 +1,7 @@
 'use server';
 
 import { clearAuthCookies, createClient, getAuthenticatedUserId } from '@/lib/supabase/server';
+import { ConsultationRow } from '@/types/global';
 import { rethrowRedirectError } from '@/utils/error-utils';
 import { getDerivedConsultationStatus } from '@/utils/status-utils';
 
@@ -16,7 +17,7 @@ export async function signOut() {
   }
 }
 
-export async function getConsultationList(offset = 0, limit = 5) {
+export async function getConsultationList({ offset = 0, limit = 5 }: { offset: number; limit: number }) {
   try {
     const supabase = await createClient();
     const userId = await getAuthenticatedUserId();
@@ -48,44 +49,15 @@ export async function getConsultationList(offset = 0, limit = 5) {
   }
 }
 
-export async function createConsultation(formData: {
-  firstName: string;
-  lastName: string;
-  reason: string;
-  scheduledAt: Date;
-}) {
-  try {
-    const supabase = await createClient();
-    const userId = await getAuthenticatedUserId();
-
-    const { error } = await supabase.from('consultations').insert({
-      user_id: userId,
-      first_name: formData.firstName,
-      last_name: formData.lastName,
-      reason: formData.reason,
-      scheduled_at: formData.scheduledAt.toISOString(),
-    });
-
-    if (error) {
-      return { success: false };
-    }
-
-    return { success: true };
-  } catch (error) {
-    rethrowRedirectError(error);
-    return { success: false };
-  }
-}
-
-export async function markConsultation(consultationId: string, isCompleted: boolean) {
+export async function markConsultation(data: Pick<ConsultationRow, 'id' | 'is_completed'>) {
   try {
     const supabase = await createClient();
     const userId = await getAuthenticatedUserId();
 
     const { error } = await supabase
       .from('consultations')
-      .update({ is_completed: isCompleted })
-      .eq('id', consultationId)
+      .update({ is_completed: data.is_completed })
+      .eq('id', data.id)
       .eq('user_id', userId);
 
     if (error) {

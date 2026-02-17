@@ -2,15 +2,13 @@
 
 import { signOut } from '@/app/(protected)/dashboard/actions';
 import { Button } from '@/lib/shadcn/components/ui/button';
+import { useUserDetails } from '@/lib/supabase/auth-provider';
 import { BookOpen, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function DashboardHeader() {
   const router = useRouter();
-  const user = {
-    firstName: 'John',
-    lastName: 'Doe',
-  };
+  const user = useUserDetails();
 
   const handleLogout = async () => {
     await signOut();

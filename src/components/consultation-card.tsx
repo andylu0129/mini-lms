@@ -107,7 +107,7 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
     }
 
     try {
-      const result = await markConsultation(consultation.id, isCompleted);
+      const result = await markConsultation({ id: consultation.id, is_completed: isCompleted });
 
       if (result.success) {
         setConsultationStatus(actionType);
