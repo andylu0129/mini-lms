@@ -11,8 +11,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check current session on mount and only render children once verified.
-    supabase.auth.getClaims().then(({ data, error }) => {
-      if (error || !data?.claims) {
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (error || !data?.user) {
         router.push('/auth/sign-in');
       } else {
         setIsAuthenticated(true);

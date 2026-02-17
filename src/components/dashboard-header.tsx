@@ -8,9 +8,9 @@ export function DashboardHeader() {
     firstName: 'John',
     lastName: 'Doe',
   };
-  function handleLogout() {
+  const handleLogout = () => {
     // TODO: Implement logout logic.
-  }
+  };
 
   return (
     <header className="border-border bg-card border-b">

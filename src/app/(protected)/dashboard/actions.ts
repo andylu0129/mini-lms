@@ -8,12 +8,12 @@ export async function getConsultationList(offset = 0, limit = 5) {
     const supabase = await createClient();
 
     const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-    const userId = session?.user?.id;
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
 
-    if (!userId || sessionError) {
+    if (!userId || userError) {
       return { success: false, data: [], hasMore: false };
     }
 
@@ -40,5 +40,35 @@ export async function getConsultationList(offset = 0, limit = 5) {
       data: [],
       hasMore: false,
     };
+  }
+}
+
+export async function markConsultation(consultationId: string, isCompleted: boolean) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
+
+    if (!userId || userError) {
+      return { success: false };
+    }
+
+    const { error } = await supabase
+      .from('consultations')
+      .update({ is_completed: isCompleted })
+      .eq('id', consultationId)
+      .eq('user_id', userId);
+
+    if (error) {
+      return { success: false };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false };
   }
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { markConsultation } from '@/app/(protected)/dashboard/actions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,72 +15,120 @@ import { Badge } from '@/lib/shadcn/components/ui/badge';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent } from '@/lib/shadcn/components/ui/card';
 import { ConsultationRowWithStatus, ConsultationStatus } from '@/types/global';
-import { ArrowRightCircle, Calendar, CheckCircle2, Circle, Clock, XCircle } from 'lucide-react';
+import { ArrowRightCircle, Calendar, CheckCircle2, Circle, Clock, Loader2, XCircle } from 'lucide-react';
 import moment from 'moment';
 import { useState } from 'react';
 
+type ActionType = Extract<ConsultationStatus, 'complete' | 'incomplete'>;
+
+const badgeMap: Record<ConsultationStatus, React.ReactNode> = {
+  upcoming: (
+    <Badge variant="secondary" className="border-0 text-xs">
+      Upcoming
+    </Badge>
+  ),
+  pending: <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">Pending</Badge>,
+  complete: <Badge className="bg-primary/15 text-primary hover:bg-primary/20 border-0 text-xs">Complete</Badge>,
+  incomplete: (
+    <Badge variant="destructive" className="border-0 text-xs">
+      Incomplete
+    </Badge>
+  ),
+};
+
+const iconMap: Record<ConsultationStatus, React.ReactNode> = {
+  upcoming: <ArrowRightCircle className="text-muted-foreground h-5 w-5" aria-hidden="true" />,
+  pending: <Circle className="text-accent h-5 w-5" aria-hidden="true" />,
+  complete: <CheckCircle2 className="text-primary h-5 w-5" aria-hidden="true" />,
+  incomplete: <XCircle className="text-destructive h-5 w-5" aria-hidden="true" />,
+};
+
+const cardStyleMap: Record<ConsultationStatus, string> = {
+  upcoming: 'border-border bg-card',
+  pending: 'border-accent/30 bg-accent/5',
+  complete: 'border-primary/30 bg-primary/5',
+  incomplete: 'border-destructive/30 bg-destructive/5',
+};
+
+const getConfirmModalContent = (actionType: ActionType) => {
+  switch (actionType) {
+    case 'complete':
+      return {
+        title: 'Mark as Complete?',
+        description: 'This will mark the consultation as complete. You can change this later.',
+      };
+    case 'incomplete':
+      return {
+        title: 'Mark as Incomplete?',
+        description: 'This will mark the consultation as incomplete. You can change this later.',
+      };
+    default:
+      return {
+        title: '',
+        description: '',
+      };
+  }
+};
+
 export function ConsultationCard({ consultation }: { consultation: ConsultationRowWithStatus }) {
-  const consultationStatus = consultation.status;
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<ConsultationStatus | null>(null);
+  const [consultationStatus, setConsultationStatus] = useState<ConsultationStatus>(consultation.status);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [actionType, setActionType] = useState<ActionType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmModalContent, setConfirmModalContent] = useState({
+    title: '',
+    description: '',
+  });
 
-  const dateObj = new Date(consultation.scheduled_at);
-  const formattedDate = moment(dateObj).format('DD MMM YYYY'); // e.g., 16 Feb 2026
-  const formattedTime = moment(dateObj).format('hh:mm a'); // e.g., 08:45 pm
+  const dateObject = new Date(consultation.scheduled_at);
+  const formattedDate = moment(dateObject).format('DD MMM YYYY'); // e.g., 16 Feb 2026
+  const formattedTime = moment(dateObject).format('hh:mm a'); // e.g., 08:45 pm
 
-  function handleMarkClick(newStatus: ConsultationStatus) {
-    setPendingAction(newStatus);
-    setConfirmOpen(true);
-  }
-
-  function handleConfirm() {
-    setConfirmOpen(false);
-    setPendingAction(null);
-  }
-
-  function handleCancel() {
-    setConfirmOpen(false);
-    setPendingAction(null);
-  }
-
-  // Badge per state
-  const badgeMap: Record<ConsultationStatus, React.ReactNode> = {
-    upcoming: (
-      <Badge variant="secondary" className="text-xs">
-        Upcoming
-      </Badge>
-    ),
-    pending: <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">Pending</Badge>,
-    complete: <Badge className="bg-primary/15 text-primary hover:bg-primary/20 border-0 text-xs">Complete</Badge>,
-    incomplete: (
-      <Badge variant="destructive" className="text-xs">
-        Incomplete
-      </Badge>
-    ),
+  const handleActionButtonClick = (actionType: ActionType) => {
+    const { title, description } = getConfirmModalContent(actionType);
+    setConfirmModalContent({ title: title, description: description });
+    setActionType(actionType);
+    setError(null);
+    setConfirmModalOpen(true);
   };
 
-  // Icon per state
-  const iconMap: Record<ConsultationStatus, React.ReactNode> = {
-    upcoming: <ArrowRightCircle className="text-muted-foreground h-5 w-5" aria-hidden="true" />,
-    pending: <Circle className="text-accent h-5 w-5" aria-hidden="true" />,
-    complete: <CheckCircle2 className="text-primary h-5 w-5" aria-hidden="true" />,
-    incomplete: <XCircle className="text-destructive h-5 w-5" aria-hidden="true" />,
+  const handleConfirm = async (actionType: ActionType) => {
+    setIsLoading(true);
+
+    let isCompleted = null;
+    switch (actionType) {
+      case 'complete':
+        isCompleted = true;
+        break;
+      case 'incomplete':
+        isCompleted = false;
+        break;
+    }
+
+    try {
+      const result = await markConsultation(consultation.id, isCompleted);
+
+      if (result.success) {
+        setConsultationStatus(actionType);
+        setIsLoading(false);
+        setConfirmModalOpen(false);
+        setError(null);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating consultation status:', error);
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Card border/bg per state
-  const cardStyleMap: Record<ConsultationStatus, string> = {
-    upcoming: 'border-border bg-card',
-    pending: 'border-accent/30 bg-accent/5',
-    complete: 'border-primary/30 bg-primary/5',
-    incomplete: 'border-destructive/30 bg-destructive/5',
+  const handleCancel = () => {
+    setError(null);
+    setConfirmModalOpen(false);
   };
-
-  // Confirmation dialog label
-  const confirmLabel = pendingAction === 'complete' ? 'Mark as Complete?' : 'Mark as Incomplete?';
-  const confirmDescription =
-    pendingAction === 'complete'
-      ? 'This will mark the consultation as complete. You can change this later.'
-      : 'This will mark the consultation as incomplete. You can change this later.';
 
   return (
     <>
@@ -92,9 +141,10 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <div className="flex items-start justify-between gap-2 space-x-2">
                   <h3
-                    className={`min-w-0 flex-1 text-sm font-semibold text-wrap ${
-                      consultationStatus === 'complete' ? 'text-muted-foreground line-through' : 'text-foreground'
-                    }`}
+                    data-is-complete={consultationStatus === 'complete'}
+                    className={
+                      'data-[is-complete=true]:text-text-muted-foreground data-[is-complete=false]:text-foreground min-w-0 flex-1 text-sm font-semibold text-wrap data-[is-complete=true]:line-through'
+                    }
                   >
                     {consultation.reason}
                   </h3>
@@ -114,7 +164,7 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
               </div>
             </div>
 
-            {/* Action row only displays for past consultations (not upcoming) */}
+            {/* Action row only displays for past consultations (not upcoming status) */}
             {consultationStatus !== 'upcoming' && (
               <div className="border-border flex justify-end gap-2 border-t pt-3">
                 {consultationStatus === 'pending' && (
@@ -123,23 +173,23 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        handleMarkClick('incomplete');
+                        handleActionButtonClick('incomplete');
                       }}
                       className="gap-1.5 text-xs"
                     >
                       <XCircle className="h-3.5 w-3.5" />
-                      Mark as Incomplete
+                      Incomplete
                     </Button>
                     <Button
                       variant="default"
                       size="sm"
                       onClick={() => {
-                        handleMarkClick('complete');
+                        handleActionButtonClick('complete');
                       }}
                       className="gap-1.5 text-xs"
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
-                      Mark as Complete
+                      Complete
                     </Button>
                   </>
                 )}
@@ -148,12 +198,12 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      handleMarkClick('incomplete');
+                      handleActionButtonClick('incomplete');
                     }}
                     className="gap-1.5 text-xs"
                   >
                     <XCircle className="h-3.5 w-3.5" />
-                    Mark as Incomplete
+                    Incomplete
                   </Button>
                 )}
                 {consultationStatus === 'incomplete' && (
@@ -161,12 +211,12 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
                     variant="default"
                     size="sm"
                     onClick={() => {
-                      handleMarkClick('complete');
+                      handleActionButtonClick('complete');
                     }}
                     className="gap-1.5 text-xs"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5" />
-                    Mark as Complete
+                    Complete
                   </Button>
                 )}
               </div>
@@ -175,31 +225,48 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
         </CardContent>
       </Card>
 
+      {/* Confirmation modal */}
       <AlertDialog
-        open={confirmOpen}
+        open={confirmModalOpen}
         onOpenChange={(open) => {
-          setConfirmOpen(open);
+          setConfirmModalOpen(open);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent
+          onOverlayClick={() => {
+            return !isLoading && setConfirmModalOpen(false);
+          }}
+        >
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-display">{confirmLabel}</AlertDialogTitle>
-            <AlertDialogDescription>{confirmDescription}</AlertDialogDescription>
+            <AlertDialogTitle className="font-display">{confirmModalContent.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmModalContent.description}</AlertDialogDescription>
+            {error && <p className="text-destructive text-sm">{error}</p>}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              onClick={() => {
+              disabled={!confirmModalOpen || isLoading}
+              onClick={(e) => {
+                e.preventDefault();
+                if (!confirmModalOpen || isLoading) {
+                  return;
+                }
                 handleCancel();
               }}
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                handleConfirm();
+              disabled={!confirmModalOpen || isLoading}
+              onClick={async (e) => {
+                e.preventDefault();
+                if (!confirmModalOpen || !actionType || isLoading) {
+                  return;
+                }
+
+                handleConfirm(actionType);
               }}
             >
-              {pendingAction === 'complete' ? 'Yes, mark complete' : 'Yes, mark incomplete'}
+              {isLoading ? <Loader2 className="mx-4.25 h-4 w-4 animate-spin" /> : 'Confirm'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
