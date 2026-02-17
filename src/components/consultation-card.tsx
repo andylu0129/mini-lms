@@ -1,38 +1,18 @@
 'use client';
 
-import { markConsultation } from '@/app/(protected)/dashboard/actions';
-import { ERROR_SOMETHING_WENT_WRONG, TEXT_CANCEL } from '@/constants/common';
 import {
-  TEXT_CONFIRM,
-  TEXT_MARK_COMPLETE_DESCRIPTION,
-  TEXT_MARK_COMPLETE_TITLE,
-  TEXT_MARK_INCOMPLETE_DESCRIPTION,
-  TEXT_MARK_INCOMPLETE_TITLE,
   TEXT_STATUS_COMPLETE,
   TEXT_STATUS_INCOMPLETE,
   TEXT_STATUS_PENDING,
   TEXT_STATUS_UPCOMING,
 } from '@/constants/consultation-card';
 import { STATUS_COMPLETE, STATUS_INCOMPLETE, STATUS_PENDING, STATUS_UPCOMING } from '@/constants/status';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/lib/shadcn/components/ui/alert-dialog';
 import { Badge } from '@/lib/shadcn/components/ui/badge';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent } from '@/lib/shadcn/components/ui/card';
-import { ConsultationRowWithStatus, ConsultationStatus } from '@/types/global';
-import { ArrowRightCircle, Calendar, CheckCircle2, Circle, Clock, Loader2, XCircle } from 'lucide-react';
+import { ConsultationActionType, ConsultationRowWithStatus, ConsultationStatus } from '@/types/global';
+import { ArrowRightCircle, Calendar, CheckCircle2, Circle, Clock, XCircle } from 'lucide-react';
 import moment from 'moment';
-import { useState } from 'react';
-
-type ActionType = Extract<ConsultationStatus, 'complete' | 'incomplete'>;
 
 const badgeMap: Record<ConsultationStatus, React.ReactNode> = {
   upcoming: (
@@ -65,84 +45,25 @@ const cardStyleMap: Record<ConsultationStatus, string> = {
   incomplete: 'border-destructive/30 bg-destructive/5',
 };
 
-const getConfirmModalContent = (actionType: ActionType) => {
-  switch (actionType) {
-    case 'complete':
-      return {
-        title: TEXT_MARK_COMPLETE_TITLE,
-        description: TEXT_MARK_COMPLETE_DESCRIPTION,
-      };
-    case 'incomplete':
-      return {
-        title: TEXT_MARK_INCOMPLETE_TITLE,
-        description: TEXT_MARK_INCOMPLETE_DESCRIPTION,
-      };
-    default:
-      return {
-        title: '',
-        description: '',
-      };
-  }
-};
+export function ConsultationCard({
+  consultation,
+  setActionModalOpen,
+  setSelectedConsultationData,
+  setModalActionType,
+}: {
+  consultation: ConsultationRowWithStatus;
+  setActionModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedConsultationData: React.Dispatch<React.SetStateAction<ConsultationRowWithStatus | null>>;
+  setModalActionType: React.Dispatch<React.SetStateAction<ConsultationActionType | null>>;
+}) {
+  const consultationStatus = consultation.status;
+  const formattedDate = moment(consultation.scheduled_at).format('DD MMM YYYY'); // e.g., 16 Feb 2026
+  const formattedTime = moment(consultation.scheduled_at).format('hh:mm a'); // e.g., 08:45 pm
 
-export function ConsultationCard({ consultation }: { consultation: ConsultationRowWithStatus }) {
-  const [consultationStatus, setConsultationStatus] = useState<ConsultationStatus>(consultation.status);
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [actionType, setActionType] = useState<ActionType | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [confirmModalContent, setConfirmModalContent] = useState({
-    title: '',
-    description: '',
-  });
-
-  const dateObject = new Date(consultation.scheduled_at);
-  const formattedDate = moment(dateObject).format('DD MMM YYYY'); // e.g., 16 Feb 2026
-  const formattedTime = moment(dateObject).format('hh:mm a'); // e.g., 08:45 pm
-
-  const handleActionButtonClick = (actionType: ActionType) => {
-    const { title, description } = getConfirmModalContent(actionType);
-    setConfirmModalContent({ title: title, description: description });
-    setActionType(actionType);
-    setError(null);
-    setConfirmModalOpen(true);
-  };
-
-  const handleConfirm = async (actionType: ActionType) => {
-    setIsLoading(true);
-
-    let isCompleted = null;
-    switch (actionType) {
-      case STATUS_COMPLETE:
-        isCompleted = true;
-        break;
-      case STATUS_INCOMPLETE:
-        isCompleted = false;
-        break;
-    }
-
-    try {
-      const result = await markConsultation({ id: consultation.id, is_completed: isCompleted });
-
-      if (result.success) {
-        setConsultationStatus(actionType);
-        setIsLoading(false);
-        setConfirmModalOpen(false);
-        setError(null);
-      } else {
-        setError(ERROR_SOMETHING_WENT_WRONG);
-      }
-    } catch (error) {
-      console.error('Error updating consultation status:', error);
-      setError(ERROR_SOMETHING_WENT_WRONG);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setError(null);
-    setConfirmModalOpen(false);
+  const handleActionButtonClick = (actionType: ConsultationActionType) => {
+    setSelectedConsultationData(consultation);
+    setModalActionType(actionType);
+    setActionModalOpen(true);
   };
 
   return (
@@ -239,53 +160,6 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
           </div>
         </CardContent>
       </Card>
-
-      {/* Confirmation modal */}
-      <AlertDialog
-        open={confirmModalOpen}
-        onOpenChange={(open) => {
-          setConfirmModalOpen(open);
-        }}
-      >
-        <AlertDialogContent
-          onOverlayClick={() => {
-            return !isLoading && setConfirmModalOpen(false);
-          }}
-        >
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-display">{confirmModalContent.title}</AlertDialogTitle>
-            <AlertDialogDescription>{confirmModalContent.description}</AlertDialogDescription>
-            {error && <p className="text-destructive text-sm">{error}</p>}
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              disabled={!confirmModalOpen || isLoading}
-              onClick={(e) => {
-                e.preventDefault();
-                if (!confirmModalOpen || isLoading) {
-                  return;
-                }
-                handleCancel();
-              }}
-            >
-              {TEXT_CANCEL}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              disabled={!confirmModalOpen || isLoading}
-              onClick={async (e) => {
-                e.preventDefault();
-                if (!confirmModalOpen || !actionType || isLoading) {
-                  return;
-                }
-
-                handleConfirm(actionType);
-              }}
-            >
-              {isLoading ? <Loader2 className="mx-4.25 h-4 w-4 animate-spin" /> : TEXT_CONFIRM}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
