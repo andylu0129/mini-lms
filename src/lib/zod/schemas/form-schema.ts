@@ -1,17 +1,28 @@
+import {
+  VALIDATION_DATETIME_FUTURE,
+  VALIDATION_DATETIME_REQUIRED,
+  VALIDATION_FIRST_NAME_REQUIRED,
+  VALIDATION_LAST_NAME_REQUIRED,
+  VALIDATION_PASSWORD_COMPLEXITY,
+  VALIDATION_PASSWORD_MAX,
+  VALIDATION_PASSWORD_MIN,
+  VALIDATION_PASSWORDS_DO_NOT_MATCH,
+  VALIDATION_REASON_REQUIRED,
+} from '@/constants/validation';
 import z from 'zod';
 
 export const signUpFormSchema = z
   .object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
+    firstName: z.string().min(1, VALIDATION_FIRST_NAME_REQUIRED),
+    lastName: z.string().min(1, VALIDATION_LAST_NAME_REQUIRED),
     email: z.email(),
     password: z
       .string()
-      .min(8, 'Password must be at least 8 characters')
-      .max(64, 'Password must be at most 64 characters')
+      .min(8, VALIDATION_PASSWORD_MIN)
+      .max(64, VALIDATION_PASSWORD_MAX)
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).*$/,
-        'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character',
+        VALIDATION_PASSWORD_COMPLEXITY,
       ),
     confirmPassword: z.string(),
   })
@@ -20,7 +31,7 @@ export const signUpFormSchema = z
       return data.password === data.confirmPassword;
     },
     {
-      message: 'Passwords do not match',
+      message: VALIDATION_PASSWORDS_DO_NOT_MATCH,
       path: ['confirmPassword'],
     },
   );
@@ -29,15 +40,15 @@ export const signInFormSchema = z.object({
   email: z.email(),
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(64, 'Password must be at most 64 characters')
+    .min(8, VALIDATION_PASSWORD_MIN)
+    .max(64, VALIDATION_PASSWORD_MAX)
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).*$/,
-      'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character',
+      VALIDATION_PASSWORD_COMPLEXITY,
     ),
 });
 
 export const consultationBookingFormSchema = z.object({
-  reason: z.string().min(1, 'Reason for consultation is required'),
-  scheduledAt: z.date({ error: 'Date and time is required' }).min(new Date(), 'Date and time must be in the future'),
+  reason: z.string().min(1, VALIDATION_REASON_REQUIRED),
+  scheduledAt: z.date({ error: VALIDATION_DATETIME_REQUIRED }).min(new Date(), VALIDATION_DATETIME_FUTURE),
 });

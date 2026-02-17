@@ -1,0 +1,15 @@
+export const TEXT_BACK_TO_DASHBOARD = 'Back to Dashboard';
+export const TEXT_BOOKING_TITLE = 'Book a Consultation';
+export const TEXT_BOOKING_DESCRIPTION = 'Fill out the details below to schedule a new session';
+export const TEXT_BOOKING_SUCCESS_TITLE = 'Consultation Booked';
+export const TEXT_BOOKING_SUCCESS_DESCRIPTION = 'Redirecting to your dashboard...';
+export const LABEL_REASON = 'Reason for Consultation';
+export const LABEL_DATETIME = 'Date and Time';
+export const PLACEHOLDER_REASON = 'Describe the purpose of your consultation...';
+export const HINT_REASON = 'Provide a brief description so the advisor can prepare.';
+export const HINT_DATETIME = 'Choose a date and time that works for you.';
+export const LABEL_FIRST_NAME = 'First Name';
+export const LABEL_LAST_NAME = 'Last Name';
+export const PLACEHOLDER_FIRST_NAME = 'First name';
+export const PLACEHOLDER_LAST_NAME = 'Last name';
+export const ARIA_BACK_TO_DASHBOARD = 'Back to dashboard';

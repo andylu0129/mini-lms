@@ -1,0 +1,11 @@
+export const TEXT_WELCOME_BACK = 'Welcome back';
+export const TEXT_SIGN_IN_DESCRIPTION = 'Sign in to access your consultations';
+export const TEXT_SIGN_IN = 'Sign In';
+export const TEXT_NO_ACCOUNT_PROMPT = "Don't have an account? ";
+export const TEXT_CREATE_ONE = 'Create one';
+export const LABEL_EMAIL = 'Email';
+export const LABEL_PASSWORD = 'Password';
+export const PLACEHOLDER_EMAIL = 'email@example.com';
+export const PLACEHOLDER_PASSWORD = 'Enter your password';
+export const ARIA_HIDE_PASSWORD = 'Hide password';
+export const ARIA_SHOW_PASSWORD = 'Show password';

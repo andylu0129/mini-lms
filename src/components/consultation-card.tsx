@@ -1,6 +1,19 @@
 'use client';
 
 import { markConsultation } from '@/app/(protected)/dashboard/actions';
+import { ERROR_SOMETHING_WENT_WRONG, TEXT_CANCEL } from '@/constants/common';
+import {
+  TEXT_CONFIRM,
+  TEXT_MARK_COMPLETE_DESCRIPTION,
+  TEXT_MARK_COMPLETE_TITLE,
+  TEXT_MARK_INCOMPLETE_DESCRIPTION,
+  TEXT_MARK_INCOMPLETE_TITLE,
+  TEXT_STATUS_COMPLETE,
+  TEXT_STATUS_INCOMPLETE,
+  TEXT_STATUS_PENDING,
+  TEXT_STATUS_UPCOMING,
+} from '@/constants/consultation-card';
+import { STATUS_COMPLETE, STATUS_INCOMPLETE, STATUS_PENDING, STATUS_UPCOMING } from '@/constants/status';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,14 +37,16 @@ type ActionType = Extract<ConsultationStatus, 'complete' | 'incomplete'>;
 const badgeMap: Record<ConsultationStatus, React.ReactNode> = {
   upcoming: (
     <Badge variant="secondary" className="border-0 text-xs">
-      Upcoming
+      {TEXT_STATUS_UPCOMING}
     </Badge>
   ),
-  pending: <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">Pending</Badge>,
-  complete: <Badge className="bg-primary/15 text-primary hover:bg-primary/20 border-0 text-xs">Complete</Badge>,
+  pending: <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">{TEXT_STATUS_PENDING}</Badge>,
+  complete: (
+    <Badge className="bg-primary/15 text-primary hover:bg-primary/20 border-0 text-xs">{TEXT_STATUS_COMPLETE}</Badge>
+  ),
   incomplete: (
     <Badge variant="destructive" className="border-0 text-xs">
-      Incomplete
+      {TEXT_STATUS_INCOMPLETE}
     </Badge>
   ),
 };
@@ -54,13 +69,13 @@ const getConfirmModalContent = (actionType: ActionType) => {
   switch (actionType) {
     case 'complete':
       return {
-        title: 'Mark as Complete?',
-        description: 'This will mark the consultation as complete. You can change this later.',
+        title: TEXT_MARK_COMPLETE_TITLE,
+        description: TEXT_MARK_COMPLETE_DESCRIPTION,
       };
     case 'incomplete':
       return {
-        title: 'Mark as Incomplete?',
-        description: 'This will mark the consultation as incomplete. You can change this later.',
+        title: TEXT_MARK_INCOMPLETE_TITLE,
+        description: TEXT_MARK_INCOMPLETE_DESCRIPTION,
       };
     default:
       return {
@@ -98,10 +113,10 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
 
     let isCompleted = null;
     switch (actionType) {
-      case 'complete':
+      case STATUS_COMPLETE:
         isCompleted = true;
         break;
-      case 'incomplete':
+      case STATUS_INCOMPLETE:
         isCompleted = false;
         break;
     }
@@ -115,11 +130,11 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
         setConfirmModalOpen(false);
         setError(null);
       } else {
-        setError('Something went wrong. Please try again.');
+        setError(ERROR_SOMETHING_WENT_WRONG);
       }
     } catch (error) {
       console.error('Error updating consultation status:', error);
-      setError('Something went wrong. Please try again.');
+      setError(ERROR_SOMETHING_WENT_WRONG);
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +156,7 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <div className="flex items-start justify-between gap-2 space-x-2">
                   <h3
-                    data-is-complete={consultationStatus === 'complete'}
+                    data-is-complete={consultationStatus === STATUS_COMPLETE}
                     className={
                       'data-[is-complete=true]:text-text-muted-foreground data-[is-complete=false]:text-foreground min-w-0 flex-1 text-sm font-semibold text-wrap data-[is-complete=true]:line-through'
                     }
@@ -165,58 +180,58 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
             </div>
 
             {/* Action row only displays for past consultations (not upcoming status) */}
-            {consultationStatus !== 'upcoming' && (
+            {consultationStatus !== STATUS_UPCOMING && (
               <div className="border-border flex justify-end gap-2 border-t pt-3">
-                {consultationStatus === 'pending' && (
+                {consultationStatus === STATUS_PENDING && (
                   <>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        handleActionButtonClick('incomplete');
+                        handleActionButtonClick(STATUS_INCOMPLETE);
                       }}
                       className="gap-1.5 text-xs"
                     >
                       <XCircle className="h-3.5 w-3.5" />
-                      Incomplete
+                      {TEXT_STATUS_INCOMPLETE}
                     </Button>
                     <Button
                       variant="default"
                       size="sm"
                       onClick={() => {
-                        handleActionButtonClick('complete');
+                        handleActionButtonClick(STATUS_COMPLETE);
                       }}
                       className="gap-1.5 text-xs"
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
-                      Complete
+                      {TEXT_STATUS_COMPLETE}
                     </Button>
                   </>
                 )}
-                {consultationStatus === 'complete' && (
+                {consultationStatus === STATUS_COMPLETE && (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      handleActionButtonClick('incomplete');
+                      handleActionButtonClick(STATUS_INCOMPLETE);
                     }}
                     className="gap-1.5 text-xs"
                   >
                     <XCircle className="h-3.5 w-3.5" />
-                    Incomplete
+                    {TEXT_STATUS_INCOMPLETE}
                   </Button>
                 )}
-                {consultationStatus === 'incomplete' && (
+                {consultationStatus === STATUS_INCOMPLETE && (
                   <Button
                     variant="default"
                     size="sm"
                     onClick={() => {
-                      handleActionButtonClick('complete');
+                      handleActionButtonClick(STATUS_COMPLETE);
                     }}
                     className="gap-1.5 text-xs"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5" />
-                    Complete
+                    {TEXT_STATUS_COMPLETE}
                   </Button>
                 )}
               </div>
@@ -253,7 +268,7 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
                 handleCancel();
               }}
             >
-              Cancel
+              {TEXT_CANCEL}
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={!confirmModalOpen || isLoading}
@@ -266,7 +281,7 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
                 handleConfirm(actionType);
               }}
             >
-              {isLoading ? <Loader2 className="mx-4.25 h-4 w-4 animate-spin" /> : 'Confirm'}
+              {isLoading ? <Loader2 className="mx-4.25 h-4 w-4 animate-spin" /> : TEXT_CONFIRM}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

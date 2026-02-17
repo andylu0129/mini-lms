@@ -1,6 +1,8 @@
 'use client';
 
 import { signOut } from '@/app/(protected)/dashboard/actions';
+import { BROADCAST_CHANNEL_AUTH, BROADCAST_MESSAGE_SIGN_OUT, TEXT_APP_NAME, TEXT_SIGN_OUT } from '@/constants/common';
+import { ROUTE_SIGN_IN } from '@/constants/routes';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
 import { BookOpen, LogOut } from 'lucide-react';
@@ -15,8 +17,8 @@ export function DashboardHeader() {
 
     // Even if Supabase sign-out fails, cookies are cleared.
     // Force-redirect since the user wants to leave.
-    new BroadcastChannel('auth').postMessage('sign-out');
-    router.push('/auth/sign-in');
+    new BroadcastChannel(BROADCAST_CHANNEL_AUTH).postMessage(BROADCAST_MESSAGE_SIGN_OUT);
+    router.push(ROUTE_SIGN_IN);
   };
 
   return (
@@ -26,10 +28,10 @@ export function DashboardHeader() {
           <div className="bg-primary flex h-9 w-9 items-center justify-center rounded-lg">
             <BookOpen className="text-primary-foreground h-5 w-5" />
           </div>
-          <span className="font-display text-foreground text-lg font-bold">MiniLMS</span>
+          <span className="font-display text-foreground text-lg font-bold">{TEXT_APP_NAME}</span>
         </div>
         <div className="flex items-center gap-2">
-          {user && (
+          {!!user && (
             <span className="text-muted-foreground hidden text-sm sm:inline">
               {user.firstName} {user.lastName}
             </span>
@@ -40,8 +42,8 @@ export function DashboardHeader() {
             onClick={handleLogout}
             className="text-muted-foreground hover:text-foreground gap-2"
           >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign Out</span>
+            <LogOut className="size-4" />
+            <span className="inline">{TEXT_SIGN_OUT}</span>
           </Button>
         </div>
       </div>

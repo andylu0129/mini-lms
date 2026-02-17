@@ -1,6 +1,25 @@
 'use client';
 
 import { createConsultation } from '@/app/(protected)/dashboard/consultation-booking/actions';
+import { ERROR_SOMETHING_WENT_WRONG, TEXT_BOOK_CONSULTATION, TEXT_CANCEL } from '@/constants/common';
+import {
+  ARIA_BACK_TO_DASHBOARD,
+  HINT_DATETIME,
+  HINT_REASON,
+  LABEL_DATETIME,
+  LABEL_FIRST_NAME,
+  LABEL_LAST_NAME,
+  LABEL_REASON,
+  PLACEHOLDER_FIRST_NAME,
+  PLACEHOLDER_LAST_NAME,
+  PLACEHOLDER_REASON,
+  TEXT_BACK_TO_DASHBOARD,
+  TEXT_BOOKING_DESCRIPTION,
+  TEXT_BOOKING_SUCCESS_DESCRIPTION,
+  TEXT_BOOKING_SUCCESS_TITLE,
+  TEXT_BOOKING_TITLE,
+} from '@/constants/consultation-booking';
+import { ROUTE_DASHBOARD } from '@/constants/routes';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
@@ -61,11 +80,11 @@ export function ConsultationBookingForm() {
           handleBack();
         }, 2000);
       } else {
-        setError('Something went wrong. Please try again.');
+        setError(ERROR_SOMETHING_WENT_WRONG);
       }
     } catch (error) {
       console.error('Error booking consultation:', error);
-      setError('Something went wrong. Please try again.');
+      setError(ERROR_SOMETHING_WENT_WRONG);
     } finally {
       setIsFormSubmitting(false);
     }
@@ -80,14 +99,14 @@ export function ConsultationBookingForm() {
   };
 
   const handleBack = () => {
-    router.push('/dashboard');
+    router.push(ROUTE_DASHBOARD);
   };
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
       <button
         className="text-muted-foreground hover:text-foreground mb-6 flex cursor-pointer items-center gap-2 text-sm transition-colors"
-        aria-label="Back to dashboard"
+        aria-label={ARIA_BACK_TO_DASHBOARD}
         disabled={isFormSubmitting}
         onClick={() => {
           if (isFormSubmitting) {
@@ -98,7 +117,7 @@ export function ConsultationBookingForm() {
         }}
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Dashboard
+        {TEXT_BACK_TO_DASHBOARD}
       </button>
 
       <Card className="border-border shadow-lg">
@@ -108,8 +127,8 @@ export function ConsultationBookingForm() {
               <CalendarPlus className="text-primary h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="font-display text-xl">Book a Consultation</CardTitle>
-              <CardDescription>Fill out the details below to schedule a new session</CardDescription>
+              <CardTitle className="font-display text-xl">{TEXT_BOOKING_TITLE}</CardTitle>
+              <CardDescription>{TEXT_BOOKING_DESCRIPTION}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -119,8 +138,8 @@ export function ConsultationBookingForm() {
               <div className="bg-primary/10 mb-4 flex h-14 w-14 items-center justify-center rounded-full">
                 <CalendarPlus className="text-primary h-7 w-7" />
               </div>
-              <h3 className="font-display text-foreground text-lg font-semibold">Consultation Booked</h3>
-              <p className="text-muted-foreground mt-1 text-sm">Redirecting to your dashboard...</p>
+              <h3 className="font-display text-foreground text-lg font-semibold">{TEXT_BOOKING_SUCCESS_TITLE}</h3>
+              <p className="text-muted-foreground mt-1 text-sm">{TEXT_BOOKING_SUCCESS_DESCRIPTION}</p>
             </div>
           ) : (
             <form
@@ -135,22 +154,22 @@ export function ConsultationBookingForm() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="booking-first-name">First Name</Label>
+                  <Label htmlFor="booking-first-name">{LABEL_FIRST_NAME}</Label>
                   <Input
                     id="booking-first-name"
                     type="text"
-                    placeholder="First name"
+                    placeholder={PLACEHOLDER_FIRST_NAME}
                     readOnly
                     disabled
                     value={userDetails.firstName}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="booking-last-name">Last Name</Label>
+                  <Label htmlFor="booking-last-name">{LABEL_LAST_NAME}</Label>
                   <Input
                     id="booking-last-name"
                     type="text"
-                    placeholder="Last name"
+                    placeholder={PLACEHOLDER_LAST_NAME}
                     readOnly
                     disabled
                     value={userDetails.lastName}
@@ -159,19 +178,19 @@ export function ConsultationBookingForm() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="booking-reason">Reason for Consultation</Label>
+                <Label htmlFor="booking-reason">{LABEL_REASON}</Label>
                 <Textarea
                   id="booking-reason"
-                  placeholder="Describe the purpose of your consultation..."
+                  placeholder={PLACEHOLDER_REASON}
                   rows={4}
                   className="resize-none"
                   {...register('reason')}
                 />
-                <p className="text-muted-foreground text-xs">Provide a brief description so the advisor can prepare.</p>
+                <p className="text-muted-foreground text-xs">{HINT_REASON}</p>
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="booking-datetime">Date and Time</Label>
+                <Label htmlFor="booking-datetime">{LABEL_DATETIME}</Label>
                 <Input
                   id="booking-datetime"
                   type="datetime-local"
@@ -180,7 +199,7 @@ export function ConsultationBookingForm() {
                   className="[&::-webkit-calendar-picker-indicator]:cursor-pointer"
                   {...register('scheduledAt', { valueAsDate: true })}
                 />
-                <p className="text-muted-foreground text-xs">Choose a date and time that works for you.</p>
+                <p className="text-muted-foreground text-xs">{HINT_DATETIME}</p>
               </div>
 
               <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
@@ -197,10 +216,10 @@ export function ConsultationBookingForm() {
                   }}
                   className="sm:order-1"
                 >
-                  Cancel
+                  {TEXT_CANCEL}
                 </Button>
                 <Button type="submit" disabled={isFormSubmitting} className="gap-2 sm:order-2">
-                  {isFormSubmitting ? <Loader2 className="mx-12.75 h-4 w-4 animate-spin" /> : 'Book Consultation'}
+                  {isFormSubmitting ? <Loader2 className="mx-12.75 h-4 w-4 animate-spin" /> : TEXT_BOOK_CONSULTATION}
                 </Button>
               </div>
             </form>

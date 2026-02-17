@@ -1,6 +1,29 @@
 'use client';
 
 import { signUp } from '@/app/auth/sign-up/actions';
+import { ERROR_SIGN_UP_FAILED, TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
+import { ROUTE_SIGN_IN } from '@/constants/routes';
+import {
+  ARIA_HIDE_CONFIRM_PASSWORD,
+  ARIA_HIDE_PASSWORD,
+  ARIA_SHOW_CONFIRM_PASSWORD,
+  ARIA_SHOW_PASSWORD,
+  LABEL_CONFIRM_PASSWORD,
+  LABEL_EMAIL,
+  LABEL_FIRST_NAME,
+  LABEL_LAST_NAME,
+  LABEL_PASSWORD,
+  PLACEHOLDER_CONFIRM_PASSWORD,
+  PLACEHOLDER_EMAIL,
+  PLACEHOLDER_FIRST_NAME,
+  PLACEHOLDER_LAST_NAME,
+  PLACEHOLDER_PASSWORD,
+  TEXT_ALREADY_HAVE_ACCOUNT,
+  TEXT_CREATE_ACCOUNT,
+  TEXT_CREATE_ACCOUNT_DESCRIPTION,
+  TEXT_CREATE_ACCOUNT_TITLE,
+  TEXT_SIGN_IN_LINK,
+} from '@/constants/sign-up';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
@@ -60,7 +83,7 @@ export function SignUpForm() {
         resetForm();
         setIsFormSubmitted(true);
       } else {
-        setError(error || 'Sign up failed. Please try again.');
+        setError(error || ERROR_SIGN_UP_FAILED);
       }
     } catch (error) {
       console.error('Error signing up:', error);
@@ -92,14 +115,14 @@ export function SignUpForm() {
           <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-lg">
             <BookOpen className="text-primary-foreground h-6 w-6" />
           </div>
-          <h1 className="font-display text-foreground text-2xl font-bold">MiniLMS</h1>
-          <p className="text-muted-foreground text-sm">Student Consultation Portal</p>
+          <h1 className="font-display text-foreground text-2xl font-bold">{TEXT_APP_NAME}</h1>
+          <p className="text-muted-foreground text-sm">{TEXT_APP_TAGLINE}</p>
         </div>
 
         <Card className="border-border shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="font-display text-xl">Create your account</CardTitle>
-            <CardDescription>Get started with consultation management</CardDescription>
+            <CardTitle className="font-display text-xl">{TEXT_CREATE_ACCOUNT_TITLE}</CardTitle>
+            <CardDescription>{TEXT_CREATE_ACCOUNT_DESCRIPTION}</CardDescription>
           </CardHeader>
           <CardContent>
             <form
@@ -116,21 +139,21 @@ export function SignUpForm() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="signup-first-name">First Name</Label>
+                  <Label htmlFor="signup-first-name">{LABEL_FIRST_NAME}</Label>
                   <Input
                     id="signup-first-name"
                     type="text"
-                    placeholder="First name"
+                    placeholder={PLACEHOLDER_FIRST_NAME}
                     autoComplete="given-name"
                     {...register('firstName')}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="signup-last-name">Last Name</Label>
+                  <Label htmlFor="signup-last-name">{LABEL_LAST_NAME}</Label>
                   <Input
                     id="signup-last-name"
                     type="text"
-                    placeholder="Last name"
+                    placeholder={PLACEHOLDER_LAST_NAME}
                     autoComplete="family-name"
                     {...register('lastName')}
                   />
@@ -138,23 +161,23 @@ export function SignUpForm() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="signup-email">Email</Label>
+                <Label htmlFor="signup-email">{LABEL_EMAIL}</Label>
                 <Input
                   id="signup-email"
                   type="email"
-                  placeholder="email@example.com"
+                  placeholder={PLACEHOLDER_EMAIL}
                   autoComplete="email"
                   {...register('email')}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="signup-password">Password</Label>
+                <Label htmlFor="signup-password">{LABEL_PASSWORD}</Label>
                 <div className="relative">
                   <Input
                     id="signup-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="At least 8 characters"
+                    placeholder={PLACEHOLDER_PASSWORD}
                     autoComplete="new-password"
                     className="pr-10"
                     {...register('password')}
@@ -165,7 +188,7 @@ export function SignUpForm() {
                       setShowPassword(!showPassword);
                     }}
                     className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? ARIA_HIDE_PASSWORD : ARIA_SHOW_PASSWORD}
                   >
                     {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
@@ -173,12 +196,12 @@ export function SignUpForm() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="signup-confirm-password">Confirm Password</Label>
+                <Label htmlFor="signup-confirm-password">{LABEL_CONFIRM_PASSWORD}</Label>
                 <div className="relative">
                   <Input
                     id="signup-confirm-password"
                     type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Repeat your password"
+                    placeholder={PLACEHOLDER_CONFIRM_PASSWORD}
                     autoComplete="new-password"
                     {...register('confirmPassword')}
                   />
@@ -188,7 +211,7 @@ export function SignUpForm() {
                       setShowConfirmPassword(!showConfirmPassword);
                     }}
                     className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
-                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                    aria-label={showConfirmPassword ? ARIA_HIDE_CONFIRM_PASSWORD : ARIA_SHOW_CONFIRM_PASSWORD}
                   >
                     {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
@@ -196,20 +219,20 @@ export function SignUpForm() {
               </div>
 
               <Button disabled={isFormSubmitting} type="submit" className="mt-2 w-full">
-                {isFormSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Account'}
+                {isFormSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : TEXT_CREATE_ACCOUNT}
               </Button>
 
               <p className="text-muted-foreground text-center text-sm">
-                {'Already have an account? '}
+                {TEXT_ALREADY_HAVE_ACCOUNT}
                 <button
                   disabled={isFormSubmitting}
                   type="button"
                   onClick={() => {
-                    !isFormSubmitting && router.push('/auth/sign-in');
+                    !isFormSubmitting && router.push(ROUTE_SIGN_IN);
                   }}
                   className="text-primary cursor-pointer font-medium underline-offset-4 hover:underline"
                 >
-                  Sign in
+                  {TEXT_SIGN_IN_LINK}
                 </button>
               </p>
             </form>

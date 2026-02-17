@@ -1,0 +1,23 @@
+export const TEXT_CREATE_ACCOUNT_TITLE = 'Create your account';
+export const TEXT_CREATE_ACCOUNT_DESCRIPTION = 'Get started with consultation management';
+export const TEXT_CREATE_ACCOUNT = 'Create Account';
+export const TEXT_ALREADY_HAVE_ACCOUNT = 'Already have an account? ';
+export const TEXT_SIGN_IN_LINK = 'Sign in';
+export const TEXT_ACCOUNT_CREATED_TITLE = 'Account Created Successfully';
+export const TEXT_ACCOUNT_CREATED_DESCRIPTION =
+  'A confirmation email has been sent to your inbox. Please check your email and click the verification link to activate your account before signing in.';
+export const TEXT_BACK_TO_SIGN_IN = 'Back to Sign In';
+export const LABEL_FIRST_NAME = 'First Name';
+export const LABEL_LAST_NAME = 'Last Name';
+export const LABEL_EMAIL = 'Email';
+export const LABEL_PASSWORD = 'Password';
+export const LABEL_CONFIRM_PASSWORD = 'Confirm Password';
+export const PLACEHOLDER_FIRST_NAME = 'First name';
+export const PLACEHOLDER_LAST_NAME = 'Last name';
+export const PLACEHOLDER_EMAIL = 'email@example.com';
+export const PLACEHOLDER_PASSWORD = 'At least 8 characters';
+export const PLACEHOLDER_CONFIRM_PASSWORD = 'Repeat your password';
+export const ARIA_HIDE_PASSWORD = 'Hide password';
+export const ARIA_SHOW_PASSWORD = 'Show password';
+export const ARIA_HIDE_CONFIRM_PASSWORD = 'Hide confirm password';
+export const ARIA_SHOW_CONFIRM_PASSWORD = 'Show confirm password';
