@@ -7,9 +7,10 @@ import { Input } from '@/lib/shadcn/components/ui/input';
 import { Label } from '@/lib/shadcn/components/ui/label';
 import { Textarea } from '@/lib/shadcn/components/ui/textarea';
 
+import { createConsultation } from '@/app/(protected)/dashboard/actions';
 import { consultationBookingFormSchema } from '@/lib/zod/schemas/form-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, CalendarPlus } from 'lucide-react';
+import { ArrowLeft, CalendarPlus, Loader2 } from 'lucide-react';
 import moment from 'moment';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -31,6 +32,7 @@ export function ConsultationBookingForm() {
   });
 
   const [error, setError] = useState('');
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [isBookingSuccess, setIsBookingSuccess] = useState(false);
 
   const resetForm = () => {
@@ -38,14 +40,32 @@ export function ConsultationBookingForm() {
     setError('');
   };
 
-  function handleBookingSubmit(data: ConsultationBookingFormData) {
-    setError('');
-    setIsBookingSuccess(true);
-    console.log('data', data);
+  async function handleBookingSubmit(data: ConsultationBookingFormData) {
+    if (isFormSubmitting) {
+      return;
+    }
 
-    setTimeout(() => {
-      handleBack();
-    }, 2000);
+    setError('');
+    setIsFormSubmitting(true);
+
+    try {
+      const result = await createConsultation(data);
+
+      if (result.success) {
+        setIsBookingSuccess(true);
+        resetForm();
+        setTimeout(() => {
+          handleBack();
+        }, 2000);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error booking consultation:', error);
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsFormSubmitting(false);
+    }
   }
 
   const handleDisplayError = (errorObject: typeof errors) => {
@@ -61,7 +81,6 @@ export function ConsultationBookingForm() {
   };
 
   const handleBack = () => {
-    resetForm();
     router.push('/dashboard');
   };
 
@@ -71,11 +90,16 @@ export function ConsultationBookingForm() {
 
       <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
         <button
-          onClick={() => {
-            handleBack();
-          }}
           className="text-muted-foreground hover:text-foreground mb-6 flex cursor-pointer items-center gap-2 text-sm transition-colors"
           aria-label="Back to dashboard"
+          disabled={isFormSubmitting}
+          onClick={() => {
+            if (isFormSubmitting) {
+              return;
+            }
+
+            handleBack();
+          }}
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
@@ -157,16 +181,20 @@ export function ConsultationBookingForm() {
                   <Button
                     type="button"
                     variant="outline"
+                    disabled={isFormSubmitting}
                     onClick={() => {
+                      if (isFormSubmitting) {
+                        return;
+                      }
+
                       handleBack();
                     }}
                     className="sm:order-1"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" className="gap-2 sm:order-2">
-                    <CalendarPlus className="h-4 w-4" />
-                    Book Consultation
+                  <Button type="submit" disabled={isFormSubmitting} className="gap-2 sm:order-2">
+                    {isFormSubmitting ? <Loader2 className="mx-12.75 h-4 w-4 animate-spin" /> : 'Book Consultation'}
                   </Button>
                 </div>
               </form>

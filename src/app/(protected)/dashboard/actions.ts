@@ -43,6 +43,43 @@ export async function getConsultationList(offset = 0, limit = 5) {
   }
 }
 
+export async function createConsultation(formData: {
+  firstName: string;
+  lastName: string;
+  reason: string;
+  scheduledAt: Date;
+}) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
+
+    if (!userId || userError) {
+      return { success: false };
+    }
+
+    const { error } = await supabase.from('consultations').insert({
+      user_id: userId,
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      reason: formData.reason,
+      scheduled_at: formData.scheduledAt.toISOString(),
+    });
+
+    if (error) {
+      return { success: false };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false };
+  }
+}
+
 export async function markConsultation(consultationId: string, isCompleted: boolean) {
   try {
     const supabase = await createClient();
