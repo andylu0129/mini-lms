@@ -120,7 +120,7 @@ export function SignUpForm() {
                   <Input
                     id="signup-first-name"
                     type="text"
-                    placeholder="First Name"
+                    placeholder="First name"
                     autoComplete="given-name"
                     {...register('firstName')}
                   />
@@ -130,7 +130,7 @@ export function SignUpForm() {
                   <Input
                     id="signup-last-name"
                     type="text"
-                    placeholder="Last Name"
+                    placeholder="Last name"
                     autoComplete="family-name"
                     {...register('lastName')}
                   />

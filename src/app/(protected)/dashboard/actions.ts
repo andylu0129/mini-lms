@@ -1,6 +1,6 @@
 'use server';
 
-import { clearAuthCookies, createClient, getAuthenticatedUserId } from '@/lib/supabase/server';
+import { clearAuthCookies, createClient, getVerifiedUserData } from '@/lib/supabase/server';
 import { ConsultationRow } from '@/types/global';
 import { rethrowRedirectError } from '@/utils/error-utils';
 import { getDerivedConsultationStatus } from '@/utils/status-utils';
@@ -20,7 +20,7 @@ export async function signOut() {
 export async function getConsultationList({ offset = 0, limit = 5 }: { offset: number; limit: number }) {
   try {
     const supabase = await createClient();
-    const userId = await getAuthenticatedUserId();
+    const { userId } = await getVerifiedUserData();
 
     const { data, error } = await supabase
       .from('consultations')
@@ -52,7 +52,7 @@ export async function getConsultationList({ offset = 0, limit = 5 }: { offset: n
 export async function markConsultation(data: Pick<ConsultationRow, 'id' | 'is_completed'>) {
   try {
     const supabase = await createClient();
-    const userId = await getAuthenticatedUserId();
+    const { userId } = await getVerifiedUserData();
 
     const { error } = await supabase
       .from('consultations')
