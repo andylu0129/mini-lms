@@ -1,6 +1,6 @@
 'use client';
 
-import { getConsultationList, markConsultation } from '@/app/(protected)/dashboard/actions';
+import { getConsultationList, getConsultationStats, markConsultation } from '@/app/(protected)/dashboard/actions';
 import { ConsultationCard } from '@/components/consultation-card';
 import { ConsultationCardSkeleton } from '@/components/consultation-card-skeleton';
 import { COMMON_TEXT, ERRORS } from '@/constants/common';
@@ -22,7 +22,12 @@ import {
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Input } from '@/lib/shadcn/components/ui/input';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
-import { ConsultationActionType, ConsultationFilterOption, ConsultationRowWithStatus } from '@/types/global';
+import {
+  ConsultationActionType,
+  ConsultationFilterOption,
+  ConsultationRowWithStatus,
+  ConsultationStatsData,
+} from '@/types/global';
 import { ListFilter, Loader2, Plus, RefreshCw, Search, TriangleAlert } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -57,6 +62,8 @@ export function StudentDashboard() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMoreItems, setHasMoreItems] = useState(false);
   const [shouldDisplayError, setShouldDisplayError] = useState(false);
+
+  const [stats, setStats] = useState<ConsultationStatsData | null>(null);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ConsultationFilterOption>('all');
@@ -102,6 +109,18 @@ export function StudentDashboard() {
     router.push(ROUTES.CONSULTATION_BOOKING);
   };
 
+  const handleGetStats = async () => {
+    try {
+      const { success, data } = await getConsultationStats();
+
+      if (success) {
+        setStats(data[0] || null);
+      }
+    } catch (error) {
+      console.error('Error getting consultation stats:', error);
+    }
+  };
+
   const handleModalClose = () => {
     setActionModalOpen(false);
     setModalConfirmError(null);
@@ -109,10 +128,10 @@ export function StudentDashboard() {
   };
 
   const handleModalConfirm = async ({
-    consultationId,
+    consultationData,
     actionType,
   }: {
-    consultationId: ConsultationRowWithStatus['id'];
+    consultationData: ConsultationRowWithStatus;
     actionType: ConsultationActionType;
   }) => {
     setIsModalConfirmLoading(true);
@@ -128,13 +147,23 @@ export function StudentDashboard() {
     }
 
     try {
-      const { success } = await markConsultation({ id: consultationId, is_completed: isCompleted });
+      const { success } = await markConsultation({ id: consultationData.id, is_completed: isCompleted });
 
       if (success) {
         setConsultationList((prev) => {
           return prev.map((item) => {
-            return item.id === consultationId ? { ...item, status: actionType } : item;
+            return item.id === consultationData.id ? { ...item, status: actionType } : item;
           });
+        });
+        setStats((prev) => {
+          if (prev) {
+            return {
+              ...prev,
+              [consultationData.status]: Math.max(prev[consultationData.status] - 1, 0),
+              [actionType]: prev[actionType] + 1,
+            };
+          }
+          return prev;
         });
         setIsModalConfirmLoading(false);
         handleModalClose();
@@ -149,6 +178,7 @@ export function StudentDashboard() {
     }
   };
 
+  /* Lazy loading and pagination starts here */
   const loadMoreConsultationItem = useCallback(async () => {
     try {
       setIsLoadingMore(true);
@@ -208,6 +238,7 @@ export function StudentDashboard() {
   useEffect(() => {
     loadMoreConsultationItemRef.current = loadMoreConsultationItem;
   }, [loadMoreConsultationItem]);
+  /* Lazy loading and pagination ends here */
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -222,6 +253,10 @@ export function StudentDashboard() {
   useEffect(() => {
     handleGetConsultationList();
   }, [debouncedSearch, statusFilter]);
+
+  useEffect(() => {
+    handleGetStats();
+  }, []);
 
   const actionModalContent = getActionModalContent(modalActionType);
 
@@ -247,7 +282,7 @@ export function StudentDashboard() {
       </div>
 
       {/* Stats */}
-      <DashboardStats />
+      <DashboardStats stats={stats} />
 
       {/* Search and filters */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -294,7 +329,9 @@ export function StudentDashboard() {
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900">
             <TriangleAlert className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
           </div>
-          <h3 className="font-display text-lg font-semibold text-yellow-800 dark:text-yellow-200">{DASHBOARD.ERROR.TITLE}</h3>
+          <h3 className="font-display text-lg font-semibold text-yellow-800 dark:text-yellow-200">
+            {DASHBOARD.ERROR.TITLE}
+          </h3>
           <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">{DASHBOARD.ERROR.DESCRIPTION}</p>
           <Button
             onClick={() => {
@@ -386,7 +423,7 @@ export function StudentDashboard() {
                   return;
                 }
 
-                handleModalConfirm({ consultationId: selectedConsultationData.id, actionType: modalActionType });
+                handleModalConfirm({ consultationData: selectedConsultationData, actionType: modalActionType });
               }}
             >
               {isModalConfirmLoading ? <Loader2 className="mx-4.75 h-4 w-4 animate-spin" /> : CONSULTATION_CARD.CONFIRM}
