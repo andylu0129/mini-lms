@@ -19,6 +19,7 @@ import {
   TEXT_BOOKING_SUCCESS_TITLE,
   TEXT_BOOKING_TITLE,
 } from '@/constants/consultation-booking';
+import { ROUTE_DASHBOARD } from '@/constants/routes';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
@@ -98,7 +99,7 @@ export function ConsultationBookingForm() {
   };
 
   const handleBack = () => {
-    router.push('/dashboard');
+    router.push(ROUTE_DASHBOARD);
   };
 
   return (

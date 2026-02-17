@@ -13,6 +13,7 @@ import {
   TEXT_STATUS_PENDING,
   TEXT_STATUS_UPCOMING,
 } from '@/constants/consultation-card';
+import { STATUS_COMPLETE, STATUS_INCOMPLETE, STATUS_PENDING, STATUS_UPCOMING } from '@/constants/status';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -112,10 +113,10 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
 
     let isCompleted = null;
     switch (actionType) {
-      case 'complete':
+      case STATUS_COMPLETE:
         isCompleted = true;
         break;
-      case 'incomplete':
+      case STATUS_INCOMPLETE:
         isCompleted = false;
         break;
     }
@@ -155,7 +156,7 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <div className="flex items-start justify-between gap-2 space-x-2">
                   <h3
-                    data-is-complete={consultationStatus === 'complete'}
+                    data-is-complete={consultationStatus === STATUS_COMPLETE}
                     className={
                       'data-[is-complete=true]:text-text-muted-foreground data-[is-complete=false]:text-foreground min-w-0 flex-1 text-sm font-semibold text-wrap data-[is-complete=true]:line-through'
                     }
@@ -179,15 +180,15 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
             </div>
 
             {/* Action row only displays for past consultations (not upcoming status) */}
-            {consultationStatus !== 'upcoming' && (
+            {consultationStatus !== STATUS_UPCOMING && (
               <div className="border-border flex justify-end gap-2 border-t pt-3">
-                {consultationStatus === 'pending' && (
+                {consultationStatus === STATUS_PENDING && (
                   <>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        handleActionButtonClick('incomplete');
+                        handleActionButtonClick(STATUS_INCOMPLETE);
                       }}
                       className="gap-1.5 text-xs"
                     >
@@ -198,7 +199,7 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
                       variant="default"
                       size="sm"
                       onClick={() => {
-                        handleActionButtonClick('complete');
+                        handleActionButtonClick(STATUS_COMPLETE);
                       }}
                       className="gap-1.5 text-xs"
                     >
@@ -207,12 +208,12 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
                     </Button>
                   </>
                 )}
-                {consultationStatus === 'complete' && (
+                {consultationStatus === STATUS_COMPLETE && (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      handleActionButtonClick('incomplete');
+                      handleActionButtonClick(STATUS_INCOMPLETE);
                     }}
                     className="gap-1.5 text-xs"
                   >
@@ -220,12 +221,12 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
                     {TEXT_STATUS_INCOMPLETE}
                   </Button>
                 )}
-                {consultationStatus === 'incomplete' && (
+                {consultationStatus === STATUS_INCOMPLETE && (
                   <Button
                     variant="default"
                     size="sm"
                     onClick={() => {
-                      handleActionButtonClick('complete');
+                      handleActionButtonClick(STATUS_COMPLETE);
                     }}
                     className="gap-1.5 text-xs"
                   >

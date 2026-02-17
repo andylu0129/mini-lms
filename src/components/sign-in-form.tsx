@@ -2,6 +2,7 @@
 
 import { SignIn } from '@/app/auth/sign-in/actions';
 import { ERROR_SIGN_IN_FAILED, TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
+import { ROUTE_DASHBOARD, ROUTE_SIGN_UP } from '@/constants/routes';
 import {
   ARIA_HIDE_PASSWORD,
   ARIA_SHOW_PASSWORD,
@@ -63,7 +64,7 @@ export function SignInForm() {
 
       if (success) {
         resetForm();
-        router.push('/dashboard');
+        router.push(ROUTE_DASHBOARD);
       } else {
         setError(error || ERROR_SIGN_IN_FAILED);
       }
@@ -154,7 +155,7 @@ export function SignInForm() {
                   disabled={isFormSubmitting}
                   type="button"
                   onClick={() => {
-                    !isFormSubmitting && router.push('/auth/sign-up');
+                    !isFormSubmitting && router.push(ROUTE_SIGN_UP);
                   }}
                   className="text-primary cursor-pointer font-medium underline-offset-4 hover:underline"
                 >

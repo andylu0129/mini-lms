@@ -12,7 +12,9 @@ import {
   TEXT_NO_CONSULTATIONS_DESCRIPTION,
   TEXT_NO_CONSULTATIONS_TITLE,
   TEXT_RETRY,
+  TEXT_WELCOME_PREFIX,
 } from '@/constants/dashboard';
+import { ROUTE_CONSULTATION_BOOKING } from '@/constants/routes';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
 import { ConsultationRowWithStatus } from '@/types/global';
@@ -58,7 +60,7 @@ export function StudentDashboard() {
   };
 
   const handleBookConsultationClick = () => {
-    router.push('/dashboard/consultation-booking');
+    router.push(ROUTE_CONSULTATION_BOOKING);
   };
 
   const loadMore = useCallback(async () => {
@@ -124,7 +126,7 @@ export function StudentDashboard() {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-foreground text-2xl font-bold text-balance sm:text-3xl">
-            {userDetails ? `Welcome, ${userDetails.firstName}` : TEXT_MY_CONSULTATIONS}
+            {userDetails ? `${TEXT_WELCOME_PREFIX}${userDetails.firstName}` : TEXT_MY_CONSULTATIONS}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">{TEXT_DASHBOARD_SUBTITLE}</p>
         </div>

@@ -7,3 +7,6 @@ export const ERROR_SOMETHING_WENT_WRONG = 'Something went wrong. Please try agai
 export const ERROR_AN_ERROR_OCCURRED = 'An error occurred';
 export const ERROR_SIGN_IN_FAILED = 'Sign in failed. Please try again.';
 export const ERROR_SIGN_UP_FAILED = 'Sign up failed. Please try again.';
+export const BROADCAST_CHANNEL_AUTH = 'auth';
+export const BROADCAST_MESSAGE_SIGN_OUT = 'sign-out';
+export const TABLE_CONSULTATIONS = 'consultations';

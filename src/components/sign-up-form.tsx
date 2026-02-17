@@ -2,6 +2,7 @@
 
 import { signUp } from '@/app/auth/sign-up/actions';
 import { ERROR_SIGN_UP_FAILED, TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
+import { ROUTE_SIGN_IN } from '@/constants/routes';
 import {
   ARIA_HIDE_CONFIRM_PASSWORD,
   ARIA_HIDE_PASSWORD,
@@ -227,7 +228,7 @@ export function SignUpForm() {
                   disabled={isFormSubmitting}
                   type="button"
                   onClick={() => {
-                    !isFormSubmitting && router.push('/auth/sign-in');
+                    !isFormSubmitting && router.push(ROUTE_SIGN_IN);
                   }}
                   className="text-primary cursor-pointer font-medium underline-offset-4 hover:underline"
                 >

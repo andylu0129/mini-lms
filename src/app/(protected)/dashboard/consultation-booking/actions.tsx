@@ -1,5 +1,6 @@
 'use server';
 
+import { TABLE_CONSULTATIONS } from '@/constants/common';
 import { createClient, getVerifiedUserData } from '@/lib/supabase/server';
 import { ConsultationRow } from '@/types/global';
 import { rethrowRedirectError } from '@/utils/error-utils';
@@ -9,7 +10,7 @@ export async function createConsultation(formData: Pick<ConsultationRow, 'reason
     const supabase = await createClient();
     const { userId, firstName, lastName } = await getVerifiedUserData();
 
-    const { error } = await supabase.from('consultations').insert({
+    const { error } = await supabase.from(TABLE_CONSULTATIONS).insert({
       user_id: userId,
       first_name: firstName,
       last_name: lastName,

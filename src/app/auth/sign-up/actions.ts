@@ -1,6 +1,7 @@
 'use server';
 
 import { ERROR_AN_ERROR_OCCURRED } from '@/constants/common';
+import { ROUTE_SIGN_IN } from '@/constants/routes';
 import { createClient } from '@/lib/supabase/server';
 
 export async function signUp({
@@ -23,7 +24,7 @@ export async function signUp({
       email: email,
       password: password,
       options: {
-        emailRedirectTo: `${origin}/auth/sign-in`,
+        emailRedirectTo: `${origin}${ROUTE_SIGN_IN}`,
         data: {
           first_name: firstName,
           last_name: lastName,

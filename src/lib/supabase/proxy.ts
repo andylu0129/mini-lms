@@ -1,3 +1,4 @@
+import { ROUTE_AUTH, ROUTE_SIGN_IN, ROUTE_SIGN_IN_PATH } from '@/constants/routes';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -39,12 +40,12 @@ export async function updateSession(request: NextRequest) {
   if (
     request.nextUrl.pathname !== '/' &&
     !user &&
-    !request.nextUrl.pathname.startsWith('/sign-in') &&
-    !request.nextUrl.pathname.startsWith('/auth')
+    !request.nextUrl.pathname.startsWith(ROUTE_SIGN_IN_PATH) &&
+    !request.nextUrl.pathname.startsWith(ROUTE_AUTH)
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
-    url.pathname = '/auth/sign-in';
+    url.pathname = ROUTE_SIGN_IN;
     return NextResponse.redirect(url);
   }
 

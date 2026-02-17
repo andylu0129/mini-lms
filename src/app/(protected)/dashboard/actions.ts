@@ -1,5 +1,6 @@
 'use server';
 
+import { TABLE_CONSULTATIONS } from '@/constants/common';
 import { clearAuthCookies, createClient, getVerifiedUserData } from '@/lib/supabase/server';
 import { ConsultationRow } from '@/types/global';
 import { rethrowRedirectError } from '@/utils/error-utils';
@@ -23,7 +24,7 @@ export async function getConsultationList({ offset = 0, limit = 5 }: { offset: n
     const { userId } = await getVerifiedUserData();
 
     const { data, error } = await supabase
-      .from('consultations')
+      .from(TABLE_CONSULTATIONS)
       .select('*')
       .eq('user_id', userId)
       .order('scheduled_at', { ascending: false })
@@ -55,7 +56,7 @@ export async function markConsultation(data: Pick<ConsultationRow, 'id' | 'is_co
     const { userId } = await getVerifiedUserData();
 
     const { error } = await supabase
-      .from('consultations')
+      .from(TABLE_CONSULTATIONS)
       .update({ is_completed: data.is_completed })
       .eq('id', data.id)
       .eq('user_id', userId);

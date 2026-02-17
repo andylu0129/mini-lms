@@ -1,7 +1,8 @@
 'use client';
 
 import { signOut } from '@/app/(protected)/dashboard/actions';
-import { TEXT_APP_NAME, TEXT_SIGN_OUT } from '@/constants/common';
+import { BROADCAST_CHANNEL_AUTH, BROADCAST_MESSAGE_SIGN_OUT, TEXT_APP_NAME, TEXT_SIGN_OUT } from '@/constants/common';
+import { ROUTE_SIGN_IN } from '@/constants/routes';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
 import { BookOpen, LogOut } from 'lucide-react';
@@ -16,8 +17,8 @@ export function DashboardHeader() {
 
     // Even if Supabase sign-out fails, cookies are cleared.
     // Force-redirect since the user wants to leave.
-    new BroadcastChannel('auth').postMessage('sign-out');
-    router.push('/auth/sign-in');
+    new BroadcastChannel(BROADCAST_CHANNEL_AUTH).postMessage(BROADCAST_MESSAGE_SIGN_OUT);
+    router.push(ROUTE_SIGN_IN);
   };
 
   return (

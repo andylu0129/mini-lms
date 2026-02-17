@@ -1,6 +1,7 @@
 'use client';
 
 import { TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
+import { ROUTE_SIGN_IN } from '@/constants/routes';
 import {
   TEXT_ACCOUNT_CREATED_DESCRIPTION,
   TEXT_ACCOUNT_CREATED_TITLE,
@@ -15,7 +16,7 @@ export function SignUpSuccess() {
   const router = useRouter();
 
   const navigateToSignInPage = () => {
-    router.push('/auth/sign-in');
+    router.push(ROUTE_SIGN_IN);
   };
 
   return (
