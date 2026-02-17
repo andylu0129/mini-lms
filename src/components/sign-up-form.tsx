@@ -1,36 +1,10 @@
 'use client';
 
 import { signUp } from '@/app/auth/sign-up/actions';
-import { ERROR_SIGN_UP_FAILED, TEXT_APP_NAME, TEXT_APP_TAGLINE } from '@/constants/common';
-import {
-  FIELD_CONFIRM_PASSWORD,
-  FIELD_EMAIL,
-  FIELD_FIRST_NAME,
-  FIELD_LAST_NAME,
-  FIELD_PASSWORD,
-} from '@/constants/fields';
-import { ROUTE_SIGN_IN } from '@/constants/routes';
-import {
-  ARIA_HIDE_CONFIRM_PASSWORD,
-  ARIA_HIDE_PASSWORD,
-  ARIA_SHOW_CONFIRM_PASSWORD,
-  ARIA_SHOW_PASSWORD,
-  LABEL_CONFIRM_PASSWORD,
-  LABEL_EMAIL,
-  LABEL_FIRST_NAME,
-  LABEL_LAST_NAME,
-  LABEL_PASSWORD,
-  PLACEHOLDER_CONFIRM_PASSWORD,
-  PLACEHOLDER_EMAIL,
-  PLACEHOLDER_FIRST_NAME,
-  PLACEHOLDER_LAST_NAME,
-  PLACEHOLDER_PASSWORD,
-  TEXT_ALREADY_HAVE_ACCOUNT,
-  TEXT_CREATE_ACCOUNT,
-  TEXT_CREATE_ACCOUNT_DESCRIPTION,
-  TEXT_CREATE_ACCOUNT_TITLE,
-  TEXT_SIGN_IN_LINK,
-} from '@/constants/sign-up';
+import { APP, ERRORS } from '@/constants/common';
+import { FIELDS } from '@/constants/fields';
+import { ROUTES } from '@/constants/routes';
+import { SIGN_UP_TEXT } from '@/constants/sign-up';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/shadcn/components/ui/card';
 import { Input } from '@/lib/shadcn/components/ui/input';
@@ -79,10 +53,10 @@ export function SignUpForm() {
 
     try {
       const { success, error } = await signUp({
-        [FIELD_FIRST_NAME]: data[FIELD_FIRST_NAME],
-        [FIELD_LAST_NAME]: data[FIELD_LAST_NAME],
-        [FIELD_EMAIL]: data[FIELD_EMAIL],
-        [FIELD_PASSWORD]: data[FIELD_PASSWORD],
+        [FIELDS.FIRST_NAME]: data[FIELDS.FIRST_NAME],
+        [FIELDS.LAST_NAME]: data[FIELDS.LAST_NAME],
+        [FIELDS.EMAIL]: data[FIELDS.EMAIL],
+        [FIELDS.PASSWORD]: data[FIELDS.PASSWORD],
         origin: window.location.origin,
       });
 
@@ -90,7 +64,7 @@ export function SignUpForm() {
         resetForm();
         setIsFormSubmitted(true);
       } else {
-        setError(error || ERROR_SIGN_UP_FAILED);
+        setError(error || ERRORS.SIGN_UP_FAILED);
       }
     } catch (error) {
       console.error('Error signing up:', error);
@@ -100,16 +74,16 @@ export function SignUpForm() {
   };
 
   const handleDisplayError = (errorObject: typeof errors) => {
-    if (errorObject[FIELD_FIRST_NAME]) {
-      setError(errorObject[FIELD_FIRST_NAME].message || '');
-    } else if (errorObject[FIELD_LAST_NAME]) {
-      setError(errorObject[FIELD_LAST_NAME].message || '');
-    } else if (errorObject[FIELD_EMAIL]) {
-      setError(errorObject[FIELD_EMAIL].message || '');
-    } else if (errorObject[FIELD_PASSWORD]) {
-      setError(errorObject[FIELD_PASSWORD].message || '');
-    } else if (errorObject[FIELD_CONFIRM_PASSWORD]) {
-      setError(errorObject[FIELD_CONFIRM_PASSWORD].message || '');
+    if (errorObject[FIELDS.FIRST_NAME]) {
+      setError(errorObject[FIELDS.FIRST_NAME]?.message || '');
+    } else if (errorObject[FIELDS.LAST_NAME]) {
+      setError(errorObject[FIELDS.LAST_NAME]?.message || '');
+    } else if (errorObject[FIELDS.EMAIL]) {
+      setError(errorObject[FIELDS.EMAIL]?.message || '');
+    } else if (errorObject[FIELDS.PASSWORD]) {
+      setError(errorObject[FIELDS.PASSWORD]?.message || '');
+    } else if (errorObject[FIELDS.CONFIRM_PASSWORD]) {
+      setError(errorObject[FIELDS.CONFIRM_PASSWORD]?.message || '');
     }
   };
 
@@ -122,14 +96,14 @@ export function SignUpForm() {
           <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-lg">
             <BookOpen className="text-primary-foreground h-6 w-6" />
           </div>
-          <h1 className="font-display text-foreground text-2xl font-bold">{TEXT_APP_NAME}</h1>
-          <p className="text-muted-foreground text-sm">{TEXT_APP_TAGLINE}</p>
+          <h1 className="font-display text-foreground text-2xl font-bold">{APP.NAME}</h1>
+          <p className="text-muted-foreground text-sm">{APP.TAGLINE}</p>
         </div>
 
         <Card className="border-border shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="font-display text-xl">{TEXT_CREATE_ACCOUNT_TITLE}</CardTitle>
-            <CardDescription>{TEXT_CREATE_ACCOUNT_DESCRIPTION}</CardDescription>
+            <CardTitle className="font-display text-xl">{SIGN_UP_TEXT.TITLE}</CardTitle>
+            <CardDescription>{SIGN_UP_TEXT.DESCRIPTION}</CardDescription>
           </CardHeader>
           <CardContent>
             <form
@@ -146,48 +120,48 @@ export function SignUpForm() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="signup-first-name">{LABEL_FIRST_NAME}</Label>
+                  <Label htmlFor="signup-first-name">{SIGN_UP_TEXT.LABEL.FIRST_NAME}</Label>
                   <Input
                     id="signup-first-name"
                     type="text"
-                    placeholder={PLACEHOLDER_FIRST_NAME}
+                    placeholder={SIGN_UP_TEXT.PLACEHOLDER.FIRST_NAME}
                     autoComplete="given-name"
-                    {...register(FIELD_FIRST_NAME)}
+                    {...register(FIELDS.FIRST_NAME)}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="signup-last-name">{LABEL_LAST_NAME}</Label>
+                  <Label htmlFor="signup-last-name">{SIGN_UP_TEXT.LABEL.LAST_NAME}</Label>
                   <Input
                     id="signup-last-name"
                     type="text"
-                    placeholder={PLACEHOLDER_LAST_NAME}
+                    placeholder={SIGN_UP_TEXT.PLACEHOLDER.LAST_NAME}
                     autoComplete="family-name"
-                    {...register(FIELD_LAST_NAME)}
+                    {...register(FIELDS.LAST_NAME)}
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="signup-email">{LABEL_EMAIL}</Label>
+                <Label htmlFor="signup-email">{SIGN_UP_TEXT.LABEL.EMAIL}</Label>
                 <Input
                   id="signup-email"
                   type="email"
-                  placeholder={PLACEHOLDER_EMAIL}
+                  placeholder={SIGN_UP_TEXT.PLACEHOLDER.EMAIL}
                   autoComplete="email"
-                  {...register(FIELD_EMAIL)}
+                  {...register(FIELDS.EMAIL)}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="signup-password">{LABEL_PASSWORD}</Label>
+                <Label htmlFor="signup-password">{SIGN_UP_TEXT.LABEL.PASSWORD}</Label>
                 <div className="relative">
                   <Input
                     id="signup-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder={PLACEHOLDER_PASSWORD}
+                    placeholder={SIGN_UP_TEXT.PLACEHOLDER.PASSWORD}
                     autoComplete="new-password"
                     className="pr-10"
-                    {...register(FIELD_PASSWORD)}
+                    {...register(FIELDS.PASSWORD)}
                   />
                   <button
                     type="button"
@@ -195,7 +169,7 @@ export function SignUpForm() {
                       setShowPassword(!showPassword);
                     }}
                     className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
-                    aria-label={showPassword ? ARIA_HIDE_PASSWORD : ARIA_SHOW_PASSWORD}
+                    aria-label={showPassword ? SIGN_UP_TEXT.ARIA.HIDE_PASSWORD : SIGN_UP_TEXT.ARIA.SHOW_PASSWORD}
                   >
                     {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
@@ -203,14 +177,14 @@ export function SignUpForm() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="signup-confirm-password">{LABEL_CONFIRM_PASSWORD}</Label>
+                <Label htmlFor="signup-confirm-password">{SIGN_UP_TEXT.LABEL.CONFIRM_PASSWORD}</Label>
                 <div className="relative">
                   <Input
                     id="signup-confirm-password"
                     type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder={PLACEHOLDER_CONFIRM_PASSWORD}
+                    placeholder={SIGN_UP_TEXT.PLACEHOLDER.CONFIRM_PASSWORD}
                     autoComplete="new-password"
-                    {...register(FIELD_CONFIRM_PASSWORD)}
+                    {...register(FIELDS.CONFIRM_PASSWORD)}
                   />
                   <button
                     type="button"
@@ -218,7 +192,11 @@ export function SignUpForm() {
                       setShowConfirmPassword(!showConfirmPassword);
                     }}
                     className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
-                    aria-label={showConfirmPassword ? ARIA_HIDE_CONFIRM_PASSWORD : ARIA_SHOW_CONFIRM_PASSWORD}
+                    aria-label={
+                      showConfirmPassword
+                        ? SIGN_UP_TEXT.ARIA.HIDE_CONFIRM_PASSWORD
+                        : SIGN_UP_TEXT.ARIA.SHOW_CONFIRM_PASSWORD
+                    }
                   >
                     {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
@@ -226,20 +204,20 @@ export function SignUpForm() {
               </div>
 
               <Button disabled={isFormSubmitting} type="submit" className="mt-2 w-full">
-                {isFormSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : TEXT_CREATE_ACCOUNT}
+                {isFormSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : SIGN_UP_TEXT.SUBMIT}
               </Button>
 
               <p className="text-muted-foreground text-center text-sm">
-                {TEXT_ALREADY_HAVE_ACCOUNT}
+                {SIGN_UP_TEXT.ALREADY_HAVE_ACCOUNT}
                 <button
                   disabled={isFormSubmitting}
                   type="button"
                   onClick={() => {
-                    !isFormSubmitting && router.push(ROUTE_SIGN_IN);
+                    !isFormSubmitting && router.push(ROUTES.SIGN_IN);
                   }}
                   className="text-primary cursor-pointer font-medium underline-offset-4 hover:underline"
                 >
-                  {TEXT_SIGN_IN_LINK}
+                  {SIGN_UP_TEXT.SIGN_IN_LINK}
                 </button>
               </p>
             </form>

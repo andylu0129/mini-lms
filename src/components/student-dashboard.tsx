@@ -3,31 +3,12 @@
 import { getConsultationList, markConsultation } from '@/app/(protected)/dashboard/actions';
 import { ConsultationCard } from '@/components/consultation-card';
 import { ConsultationCardSkeleton } from '@/components/consultation-card-skeleton';
-import { ERROR_SOMETHING_WENT_WRONG, TEXT_BOOK_CONSULTATION, TEXT_CANCEL } from '@/constants/common';
-import {
-  TEXT_CONFIRM,
-  TEXT_MARK_COMPLETE_DESCRIPTION,
-  TEXT_MARK_COMPLETE_TITLE,
-  TEXT_MARK_INCOMPLETE_DESCRIPTION,
-  TEXT_MARK_INCOMPLETE_TITLE,
-} from '@/constants/consultation-card';
-import {
-  ERROR_DESCRIPTION,
-  ERROR_TITLE,
-  PAGINATION_SIZE,
-  SEARCH_DEBOUNCE_MS,
-  TEXT_DASHBOARD_SUBTITLE,
-  TEXT_MY_CONSULTATIONS,
-  TEXT_NO_CONSULTATIONS_DESCRIPTION,
-  TEXT_NO_CONSULTATIONS_TITLE,
-  TEXT_RETRY,
-  TEXT_SEARCH_ARIA_LABEL,
-  TEXT_SEARCH_PLACEHOLDER,
-  TEXT_WELCOME_PREFIX,
-} from '@/constants/dashboard';
-import { FIELD_FIRST_NAME } from '@/constants/fields';
-import { ROUTE_CONSULTATION_BOOKING } from '@/constants/routes';
-import { STATUS_ALL, STATUS_COMPLETE, STATUS_INCOMPLETE, STATUS_PENDING, STATUS_UPCOMING } from '@/constants/status';
+import { COMMON_TEXT, ERRORS } from '@/constants/common';
+import { CONSULTATION_CARD } from '@/constants/consultation-card';
+import { DASHBOARD } from '@/constants/dashboard';
+import { FIELDS } from '@/constants/fields';
+import { ROUTES } from '@/constants/routes';
+import { STATUS } from '@/constants/status';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,15 +30,15 @@ import DashboardStats from './dashboard-stats';
 
 const getActionModalContent = (actionType: ConsultationActionType | null) => {
   switch (actionType) {
-    case STATUS_COMPLETE:
+    case STATUS.COMPLETE:
       return {
-        title: TEXT_MARK_COMPLETE_TITLE,
-        description: TEXT_MARK_COMPLETE_DESCRIPTION,
+        title: CONSULTATION_CARD.MARK_COMPLETE.TITLE,
+        description: CONSULTATION_CARD.MARK_COMPLETE.DESCRIPTION,
       };
-    case STATUS_INCOMPLETE:
+    case STATUS.INCOMPLETE:
       return {
-        title: TEXT_MARK_INCOMPLETE_TITLE,
-        description: TEXT_MARK_INCOMPLETE_DESCRIPTION,
+        title: CONSULTATION_CARD.MARK_INCOMPLETE.TITLE,
+        description: CONSULTATION_CARD.MARK_INCOMPLETE.DESCRIPTION,
       };
     default:
       return {
@@ -99,7 +80,7 @@ export function StudentDashboard() {
 
       const { success, data, hasMore } = await getConsultationList({
         offset: 0,
-        limit: PAGINATION_SIZE,
+        limit: DASHBOARD.PAGINATION_SIZE,
         search: debouncedSearch,
         filter: statusFilter,
       });
@@ -118,7 +99,7 @@ export function StudentDashboard() {
   };
 
   const handleBookConsultationClick = () => {
-    router.push(ROUTE_CONSULTATION_BOOKING);
+    router.push(ROUTES.CONSULTATION_BOOKING);
   };
 
   const handleModalClose = () => {
@@ -138,10 +119,10 @@ export function StudentDashboard() {
 
     let isCompleted = null;
     switch (actionType) {
-      case STATUS_COMPLETE:
+      case STATUS.COMPLETE:
         isCompleted = true;
         break;
-      case STATUS_INCOMPLETE:
+      case STATUS.INCOMPLETE:
         isCompleted = false;
         break;
     }
@@ -158,11 +139,11 @@ export function StudentDashboard() {
         setIsModalConfirmLoading(false);
         handleModalClose();
       } else {
-        setModalConfirmError(ERROR_SOMETHING_WENT_WRONG);
+        setModalConfirmError(ERRORS.SOMETHING_WENT_WRONG);
       }
     } catch (error) {
       console.error('Error updating consultation status:', error);
-      setModalConfirmError(ERROR_SOMETHING_WENT_WRONG);
+      setModalConfirmError(ERRORS.SOMETHING_WENT_WRONG);
     } finally {
       setIsModalConfirmLoading(false);
     }
@@ -175,7 +156,7 @@ export function StudentDashboard() {
       const offset = consultationList.length;
       const { success, data, hasMore } = await getConsultationList({
         offset,
-        limit: PAGINATION_SIZE,
+        limit: DASHBOARD.PAGINATION_SIZE,
         search: debouncedSearch,
         filter: statusFilter,
       });
@@ -231,7 +212,7 @@ export function StudentDashboard() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-    }, SEARCH_DEBOUNCE_MS);
+    }, DASHBOARD.SEARCH.DEBOUNCE_MS);
 
     return () => {
       clearTimeout(timer);
@@ -250,9 +231,9 @@ export function StudentDashboard() {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-foreground text-2xl font-bold text-balance sm:text-3xl">
-            {userDetails ? `${TEXT_WELCOME_PREFIX}${userDetails[FIELD_FIRST_NAME]}` : TEXT_MY_CONSULTATIONS}
+            {userDetails ? `${DASHBOARD.WELCOME_PREFIX}${userDetails[FIELDS.FIRST_NAME]}` : DASHBOARD.TITLE}
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">{TEXT_DASHBOARD_SUBTITLE}</p>
+          <p className="text-muted-foreground mt-1 text-sm">{DASHBOARD.SUBTITLE}</p>
         </div>
         <Button
           onClick={() => {
@@ -261,7 +242,7 @@ export function StudentDashboard() {
           className="gap-2 self-start sm:self-auto"
         >
           <Plus className="h-4 w-4" />
-          {TEXT_BOOK_CONSULTATION}
+          {COMMON_TEXT.BOOK_CONSULTATION}
         </Button>
       </div>
 
@@ -273,18 +254,18 @@ export function StudentDashboard() {
         <div className="relative flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder={TEXT_SEARCH_PLACEHOLDER}
+            placeholder={DASHBOARD.SEARCH.PLACEHOLDER}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
             }}
             className="pl-10"
-            aria-label={TEXT_SEARCH_ARIA_LABEL}
+            aria-label={DASHBOARD.SEARCH.ARIA_LABEL}
           />
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ListFilter className="text-muted-foreground h-4 w-4" aria-hidden="true" />
-          {[STATUS_ALL, STATUS_UPCOMING, STATUS_PENDING, STATUS_COMPLETE, STATUS_INCOMPLETE].map((status) => (
+          {[STATUS.ALL, STATUS.UPCOMING, STATUS.PENDING, STATUS.COMPLETE, STATUS.INCOMPLETE].map((status) => (
             <Button
               key={status}
               variant={statusFilter === status ? 'default' : 'outline'}
@@ -304,7 +285,7 @@ export function StudentDashboard() {
       {/* Consultation list */}
       {isLoading ? (
         <div className="flex flex-col gap-3">
-          {Array.from({ length: PAGINATION_SIZE }).map((_, i) => (
+          {Array.from({ length: DASHBOARD.PAGINATION_SIZE }).map((_, i) => (
             <ConsultationCardSkeleton key={i} />
           ))}
         </div>
@@ -313,8 +294,8 @@ export function StudentDashboard() {
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900">
             <TriangleAlert className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
           </div>
-          <h3 className="font-display text-lg font-semibold text-yellow-800 dark:text-yellow-200">{ERROR_TITLE}</h3>
-          <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">{ERROR_DESCRIPTION}</p>
+          <h3 className="font-display text-lg font-semibold text-yellow-800 dark:text-yellow-200">{DASHBOARD.ERROR.TITLE}</h3>
+          <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">{DASHBOARD.ERROR.DESCRIPTION}</p>
           <Button
             onClick={() => {
               handleGetConsultationList();
@@ -323,7 +304,7 @@ export function StudentDashboard() {
             variant="outline"
           >
             <RefreshCw className="h-4 w-4" />
-            {TEXT_RETRY}
+            {DASHBOARD.RETRY}
           </Button>
         </div>
       ) : consultationList.length === 0 ? (
@@ -331,8 +312,8 @@ export function StudentDashboard() {
           <div className="bg-muted mb-4 flex h-12 w-12 items-center justify-center rounded-full">
             <Search className="text-muted-foreground h-5 w-5" />
           </div>
-          <h3 className="font-display text-foreground text-lg font-semibold">{TEXT_NO_CONSULTATIONS_TITLE}</h3>
-          <p className="text-muted-foreground mt-1 text-sm">{TEXT_NO_CONSULTATIONS_DESCRIPTION}</p>
+          <h3 className="font-display text-foreground text-lg font-semibold">{DASHBOARD.NO_CONSULTATIONS.TITLE}</h3>
+          <p className="text-muted-foreground mt-1 text-sm">{DASHBOARD.NO_CONSULTATIONS.DESCRIPTION}</p>
 
           <Button
             onClick={() => {
@@ -342,7 +323,7 @@ export function StudentDashboard() {
             variant="outline"
           >
             <Plus className="h-4 w-4" />
-            {TEXT_BOOK_CONSULTATION}
+            {COMMON_TEXT.BOOK_CONSULTATION}
           </Button>
         </div>
       ) : (
@@ -361,7 +342,7 @@ export function StudentDashboard() {
             </div>
           ))}
           {!!isLoadingMore &&
-            Array.from({ length: PAGINATION_SIZE }).map((_, i) => (
+            Array.from({ length: DASHBOARD.PAGINATION_SIZE }).map((_, i) => (
               <ConsultationCardSkeleton key={`loading-more-${i}`} />
             ))}
         </div>
@@ -395,7 +376,7 @@ export function StudentDashboard() {
                 handleModalClose();
               }}
             >
-              {TEXT_CANCEL}
+              {COMMON_TEXT.CANCEL}
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={!actionModalOpen || isModalConfirmLoading}
@@ -408,7 +389,7 @@ export function StudentDashboard() {
                 handleModalConfirm({ consultationId: selectedConsultationData.id, actionType: modalActionType });
               }}
             >
-              {isModalConfirmLoading ? <Loader2 className="mx-4.75 h-4 w-4 animate-spin" /> : TEXT_CONFIRM}
+              {isModalConfirmLoading ? <Loader2 className="mx-4.75 h-4 w-4 animate-spin" /> : CONSULTATION_CARD.CONFIRM}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

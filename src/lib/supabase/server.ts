@@ -1,4 +1,4 @@
-import { ROUTE_SIGN_IN } from '@/constants/routes';
+import { ROUTES } from '@/constants/routes';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -46,7 +46,7 @@ export async function getVerifiedUserData() {
   } = await supabase.auth.getUser();
 
   if (!user?.id || error) {
-    redirect(ROUTE_SIGN_IN);
+    redirect(ROUTES.SIGN_IN);
   }
 
   return { userId: user.id, firstName: user.user_metadata?.first_name, lastName: user.user_metadata?.last_name };
@@ -57,7 +57,7 @@ export async function getUserDataFromToken() {
   const { data, error } = await supabase.auth.getClaims();
 
   if (error || !data?.claims) {
-    redirect(ROUTE_SIGN_IN);
+    redirect(ROUTES.SIGN_IN);
   }
 
   return {

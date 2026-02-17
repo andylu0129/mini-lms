@@ -1,7 +1,7 @@
 'use client';
 
-import { BROADCAST_CHANNEL_AUTH, BROADCAST_MESSAGE_SIGN_OUT } from '@/constants/common';
-import { ROUTE_SIGN_IN } from '@/constants/routes';
+import { BROADCAST } from '@/constants/common';
+import { ROUTES } from '@/constants/routes';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -34,16 +34,16 @@ export function AuthProvider({ user, children }: { user: UserDetails; children: 
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false);
-        router.push(ROUTE_SIGN_IN);
+        router.push(ROUTES.SIGN_IN);
       }
     });
 
     // Listen for sign-out broadcasts from other tabs.
-    const channel = new BroadcastChannel(BROADCAST_CHANNEL_AUTH);
+    const channel = new BroadcastChannel(BROADCAST.CHANNEL_AUTH);
     channel.onmessage = (event) => {
-      if (event.data === BROADCAST_MESSAGE_SIGN_OUT) {
+      if (event.data === BROADCAST.MESSAGE_SIGN_OUT) {
         setIsAuthenticated(false);
-        router.push(ROUTE_SIGN_IN);
+        router.push(ROUTES.SIGN_IN);
       }
     };
 

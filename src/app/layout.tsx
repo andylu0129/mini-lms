@@ -1,4 +1,4 @@
-import { META_DESCRIPTION, META_TITLE } from '@/constants/metadata';
+import { METADATA } from '@/constants/metadata';
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
@@ -14,8 +14,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: META_TITLE,
-  description: META_DESCRIPTION,
+  title: METADATA.TITLE,
+  description: METADATA.DESCRIPTION,
 };
 
 export default function RootLayout({

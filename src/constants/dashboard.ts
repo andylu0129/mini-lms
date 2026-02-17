@@ -1,12 +1,21 @@
-export const TEXT_WELCOME_PREFIX = 'Welcome, ';
-export const TEXT_RETRY = 'Retry';
-export const TEXT_NO_CONSULTATIONS_TITLE = 'No consultations found';
-export const TEXT_NO_CONSULTATIONS_DESCRIPTION = 'Book your first consultation to get started.';
-export const TEXT_MY_CONSULTATIONS = 'My Consultations';
-export const TEXT_DASHBOARD_SUBTITLE = 'Manage and track your consultation appointments';
-export const PAGINATION_SIZE = 10;
-export const SEARCH_DEBOUNCE_MS = 300;
-export const TEXT_SEARCH_PLACEHOLDER = 'Search by reason...';
-export const TEXT_SEARCH_ARIA_LABEL = 'Search consultations';
-export const ERROR_TITLE = 'Something went wrong';
-export const ERROR_DESCRIPTION = "We couldn't load your consultations. Please try again.";
+export const DASHBOARD = {
+  WELCOME_PREFIX: 'Welcome, ',
+  TITLE: 'My Consultations',
+  SUBTITLE: 'Manage and track your consultation appointments',
+  PAGINATION_SIZE: 10,
+  RETRY: 'Retry',
+  NO_CONSULTATIONS: {
+    TITLE: 'No consultations found',
+    DESCRIPTION: 'Book your first consultation to get started.',
+  },
+  SEARCH: {
+    DEBOUNCE_MS: 300,
+    PLACEHOLDER: 'Search by reason...',
+    ARIA_LABEL: 'Search consultations',
+  },
+  ERROR: {
+    TITLE: 'Something went wrong',
+    DESCRIPTION:
+      "We couldn't load your consultations. Please try again.",
+  },
+} as const;

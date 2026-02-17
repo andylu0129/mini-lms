@@ -1,10 +1,6 @@
 'use server';
 
-import {
-  PL_PGSQL_GET_CONSULTATION_COUNTS_BY_STATUS,
-  TABLE_CONSULTATIONS,
-  VIEW_CONSULTATIONS_WITH_STATUS,
-} from '@/constants/common';
+import { DB } from '@/constants/common';
 import { clearAuthCookies, createClient, getVerifiedUserData } from '@/lib/supabase/server';
 import { ConsultationRow } from '@/types/global';
 import { rethrowRedirectError } from '@/utils/error-utils';
@@ -36,7 +32,7 @@ export async function getConsultationList({
     const supabase = await createClient();
     const { userId } = await getVerifiedUserData();
 
-    let query = supabase.from(VIEW_CONSULTATIONS_WITH_STATUS).select('*').eq('user_id', userId);
+    let query = supabase.from(DB.VIEW_CONSULTATIONS_WITH_STATUS).select('*').eq('user_id', userId);
 
     if (search && search.trim().length > 0) {
       query = query.ilike('reason', `%${search.trim()}%`);
@@ -72,7 +68,7 @@ export async function markConsultation(data: Pick<ConsultationRow, 'id' | 'is_co
     const { userId } = await getVerifiedUserData();
 
     const { error } = await supabase
-      .from(TABLE_CONSULTATIONS)
+      .from(DB.TABLE_CONSULTATIONS)
       .update({ is_completed: data.is_completed })
       .eq('id', data.id)
       .eq('user_id', userId);
@@ -93,7 +89,7 @@ export async function getConsultationStats() {
     const supabase = await createClient();
     const { userId } = await getVerifiedUserData();
 
-    const { data, error } = await supabase.rpc(PL_PGSQL_GET_CONSULTATION_COUNTS_BY_STATUS, { user_id: userId });
+    const { data, error } = await supabase.rpc(DB.PL_PGSQL_GET_CONSULTATION_COUNTS_BY_STATUS, { user_id: userId });
 
     if (error) {
       return { success: false, data: [] };
