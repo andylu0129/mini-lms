@@ -29,7 +29,7 @@ export function DashboardHeader() {
           <span className="font-display text-foreground text-lg font-bold">MiniLMS</span>
         </div>
         <div className="flex items-center gap-2">
-          {user && (
+          {!!user && (
             <span className="text-muted-foreground hidden text-sm sm:inline">
               {user.firstName} {user.lastName}
             </span>
@@ -40,8 +40,8 @@ export function DashboardHeader() {
             onClick={handleLogout}
             className="text-muted-foreground hover:text-foreground gap-2"
           >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign Out</span>
+            <LogOut className="size-4" />
+            <span className="inline">Sign Out</span>
           </Button>
         </div>
       </div>
