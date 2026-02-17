@@ -1,5 +1,6 @@
 'use client';
 
+import { markConsultation } from '@/app/(protected)/dashboard/actions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +15,7 @@ import { Badge } from '@/lib/shadcn/components/ui/badge';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { Card, CardContent } from '@/lib/shadcn/components/ui/card';
 import { ConsultationRowWithStatus, ConsultationStatus } from '@/types/global';
-import { ArrowRightCircle, Calendar, CheckCircle2, Circle, Clock, XCircle } from 'lucide-react';
+import { ArrowRightCircle, Calendar, CheckCircle2, Circle, Clock, Loader2, XCircle } from 'lucide-react';
 import moment from 'moment';
 import { useState } from 'react';
 
@@ -22,14 +23,14 @@ type ActionType = Extract<ConsultationStatus, 'complete' | 'incomplete'>;
 
 const badgeMap: Record<ConsultationStatus, React.ReactNode> = {
   upcoming: (
-    <Badge variant="secondary" className="text-xs">
+    <Badge variant="secondary" className="border-0 text-xs">
       Upcoming
     </Badge>
   ),
   pending: <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">Pending</Badge>,
   complete: <Badge className="bg-primary/15 text-primary hover:bg-primary/20 border-0 text-xs">Complete</Badge>,
   incomplete: (
-    <Badge variant="destructive" className="text-xs">
+    <Badge variant="destructive" className="border-0 text-xs">
       Incomplete
     </Badge>
   ),
@@ -70,9 +71,11 @@ const getConfirmModalContent = (actionType: ActionType) => {
 };
 
 export function ConsultationCard({ consultation }: { consultation: ConsultationRowWithStatus }) {
-  const consultationStatus = consultation.status;
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [consultationStatus, setConsultationStatus] = useState<ConsultationStatus>(consultation.status);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [actionType, setActionType] = useState<ActionType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [confirmModalContent, setConfirmModalContent] = useState({
     title: '',
     description: '',
@@ -83,25 +86,48 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
   const formattedTime = moment(dateObject).format('hh:mm a'); // e.g., 08:45 pm
 
   const handleActionButtonClick = (actionType: ActionType) => {
-    // Confirmation dialog label
     const { title, description } = getConfirmModalContent(actionType);
     setConfirmModalContent({ title: title, description: description });
     setActionType(actionType);
-    setConfirmOpen(true);
+    setError(null);
+    setConfirmModalOpen(true);
   };
 
   const handleConfirm = async (actionType: ActionType) => {
+    setIsLoading(true);
+
+    let isCompleted = null;
+    switch (actionType) {
+      case 'complete':
+        isCompleted = true;
+        break;
+      case 'incomplete':
+        isCompleted = false;
+        break;
+    }
+
     try {
-      console.log('Confirming action:', actionType);
+      const result = await markConsultation(consultation.id, isCompleted);
+
+      if (result.success) {
+        setConsultationStatus(actionType);
+        setIsLoading(false);
+        setConfirmModalOpen(false);
+        setError(null);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
     } catch (error) {
       console.error('Error updating consultation status:', error);
+      setError('Something went wrong. Please try again.');
     } finally {
-      setConfirmOpen(false);
+      setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    setConfirmOpen(false);
+    setError(null);
+    setConfirmModalOpen(false);
   };
 
   return (
@@ -199,35 +225,48 @@ export function ConsultationCard({ consultation }: { consultation: ConsultationR
         </CardContent>
       </Card>
 
+      {/* Confirmation modal */}
       <AlertDialog
-        open={confirmOpen}
+        open={confirmModalOpen}
         onOpenChange={(open) => {
-          setConfirmOpen(open);
+          setConfirmModalOpen(open);
         }}
       >
-        <AlertDialogContent onOverlayClick={() => setConfirmOpen(false)}>
+        <AlertDialogContent
+          onOverlayClick={() => {
+            return !isLoading && setConfirmModalOpen(false);
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="font-display">{confirmModalContent.title}</AlertDialogTitle>
             <AlertDialogDescription>{confirmModalContent.description}</AlertDialogDescription>
+            {error && <p className="text-destructive text-sm">{error}</p>}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              onClick={() => {
+              disabled={!confirmModalOpen || isLoading}
+              onClick={(e) => {
+                e.preventDefault();
+                if (!confirmModalOpen || isLoading) {
+                  return;
+                }
                 handleCancel();
               }}
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                if (!actionType) {
+              disabled={!confirmModalOpen || isLoading}
+              onClick={async (e) => {
+                e.preventDefault();
+                if (!confirmModalOpen || !actionType || isLoading) {
                   return;
                 }
 
                 handleConfirm(actionType);
               }}
             >
-              {actionType === 'complete' ? 'Yes, mark complete' : 'Yes, mark incomplete'}
+              {isLoading ? <Loader2 className="mx-4.25 h-4 w-4 animate-spin" /> : 'Confirm'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

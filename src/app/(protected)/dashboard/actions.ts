@@ -42,3 +42,33 @@ export async function getConsultationList(offset = 0, limit = 5) {
     };
   }
 }
+
+export async function markConsultation(consultationId: string, isCompleted: boolean) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
+
+    if (!userId || userError) {
+      return { success: false };
+    }
+
+    const { error } = await supabase
+      .from('consultations')
+      .update({ is_completed: isCompleted })
+      .eq('id', consultationId)
+      .eq('user_id', userId);
+
+    if (error) {
+      return { success: false };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false };
+  }
+}
