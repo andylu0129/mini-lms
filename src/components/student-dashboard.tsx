@@ -12,7 +12,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function StudentDashboard() {
   const router = useRouter();
-  const user = useUserDetails();
+  const userDetails = useUserDetails();
 
   const PAGE_SIZE = 5;
 
@@ -114,7 +114,7 @@ export function StudentDashboard() {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-foreground text-2xl font-bold text-balance sm:text-3xl">
-            {user ? `Welcome, ${user.firstName}` : 'My Consultations'}
+            {userDetails ? `Welcome, ${userDetails.firstName}` : 'My Consultations'}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">Manage and track your consultation appointments</p>
         </div>

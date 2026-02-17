@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib
 import { Input } from '@/lib/shadcn/components/ui/input';
 import { Label } from '@/lib/shadcn/components/ui/label';
 import { Textarea } from '@/lib/shadcn/components/ui/textarea';
+import { useUserDetails } from '@/lib/supabase/auth-provider';
 import { consultationBookingFormSchema } from '@/lib/zod/schemas/form-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, CalendarPlus, Loader2 } from 'lucide-react';
@@ -19,6 +20,7 @@ type ConsultationBookingFormData = z.infer<typeof consultationBookingFormSchema>
 
 export function ConsultationBookingForm() {
   const router = useRouter();
+  const userDetails = useUserDetails();
 
   const {
     register,
@@ -48,8 +50,6 @@ export function ConsultationBookingForm() {
 
     try {
       const result = await createConsultation({
-        first_name: data.firstName,
-        last_name: data.lastName,
         reason: data.reason,
         scheduled_at: data.scheduledAt.toISOString(),
       });
@@ -72,11 +72,7 @@ export function ConsultationBookingForm() {
   }
 
   const handleDisplayError = (errorObject: typeof errors) => {
-    if (errorObject.firstName) {
-      setError(errorObject.firstName.message || '');
-    } else if (errorObject.lastName) {
-      setError(errorObject.lastName.message || '');
-    } else if (errorObject.reason) {
+    if (errorObject.reason) {
       setError(errorObject.reason.message || '');
     } else if (errorObject.scheduledAt) {
       setError(errorObject.scheduledAt.message || '');
@@ -140,11 +136,25 @@ export function ConsultationBookingForm() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="booking-first-name">First Name</Label>
-                  <Input id="booking-first-name" type="text" placeholder="Jane" {...register('firstName')} />
+                  <Input
+                    id="booking-first-name"
+                    type="text"
+                    placeholder="First name"
+                    readOnly
+                    disabled
+                    value={userDetails.firstName}
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="booking-last-name">Last Name</Label>
-                  <Input id="booking-last-name" type="text" placeholder="Doe" {...register('lastName')} />
+                  <Input
+                    id="booking-last-name"
+                    type="text"
+                    placeholder="Last name"
+                    readOnly
+                    disabled
+                    value={userDetails.lastName}
+                  />
                 </div>
               </div>
 

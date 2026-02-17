@@ -37,7 +37,7 @@ export async function clearAuthCookies() {
   });
 }
 
-export async function getAuthenticatedUserId() {
+export async function getVerifiedUserData() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -48,5 +48,20 @@ export async function getAuthenticatedUserId() {
     redirect('/auth/sign-in');
   }
 
-  return user.id;
+  return { userId: user.id, firstName: user.user_metadata?.first_name, lastName: user.user_metadata?.last_name };
+}
+
+export async function getUserDataFromToken() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.getClaims();
+
+  if (error || !data?.claims) {
+    redirect('/auth/sign-in');
+  }
+
+  return {
+    userId: data.claims?.user_id,
+    firstName: data.claims?.user_metadata?.first_name,
+    lastName: data.claims?.user_metadata?.last_name,
+  };
 }
