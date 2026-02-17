@@ -3,6 +3,16 @@
 import { getConsultationList } from '@/app/(protected)/dashboard/actions';
 import { ConsultationCard } from '@/components/consultation-card';
 import { ConsultationCardSkeleton } from '@/components/consultation-card-skeleton';
+import { TEXT_BOOK_CONSULTATION } from '@/constants/common';
+import {
+  ERROR_DESCRIPTION,
+  ERROR_TITLE,
+  TEXT_DASHBOARD_SUBTITLE,
+  TEXT_MY_CONSULTATIONS,
+  TEXT_NO_CONSULTATIONS_DESCRIPTION,
+  TEXT_NO_CONSULTATIONS_TITLE,
+  TEXT_RETRY,
+} from '@/constants/dashboard';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
 import { ConsultationRowWithStatus } from '@/types/global';
@@ -114,9 +124,9 @@ export function StudentDashboard() {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-foreground text-2xl font-bold text-balance sm:text-3xl">
-            {userDetails ? `Welcome, ${userDetails.firstName}` : 'My Consultations'}
+            {userDetails ? `Welcome, ${userDetails.firstName}` : TEXT_MY_CONSULTATIONS}
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">Manage and track your consultation appointments</p>
+          <p className="text-muted-foreground mt-1 text-sm">{TEXT_DASHBOARD_SUBTITLE}</p>
         </div>
         <Button
           onClick={() => {
@@ -125,7 +135,7 @@ export function StudentDashboard() {
           className="gap-2 self-start sm:self-auto"
         >
           <Plus className="h-4 w-4" />
-          Book Consultation
+          {TEXT_BOOK_CONSULTATION}
         </Button>
       </div>
 
@@ -141,12 +151,8 @@ export function StudentDashboard() {
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900">
             <TriangleAlert className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
           </div>
-          <h3 className="font-display text-lg font-semibold text-yellow-800 dark:text-yellow-200">
-            Something went wrong
-          </h3>
-          <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
-            We couldn&apos;t load your consultations. Please try again.
-          </p>
+          <h3 className="font-display text-lg font-semibold text-yellow-800 dark:text-yellow-200">{ERROR_TITLE}</h3>
+          <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">{ERROR_DESCRIPTION}</p>
           <Button
             onClick={() => {
               handleGetConsultationList();
@@ -155,7 +161,7 @@ export function StudentDashboard() {
             variant="outline"
           >
             <RefreshCw className="h-4 w-4" />
-            Retry
+            {TEXT_RETRY}
           </Button>
         </div>
       ) : consultationList.length === 0 ? (
@@ -163,8 +169,8 @@ export function StudentDashboard() {
           <div className="bg-muted mb-4 flex h-12 w-12 items-center justify-center rounded-full">
             <Search className="text-muted-foreground h-5 w-5" />
           </div>
-          <h3 className="font-display text-foreground text-lg font-semibold">No consultations found</h3>
-          <p className="text-muted-foreground mt-1 text-sm">Book your first consultation to get started.</p>
+          <h3 className="font-display text-foreground text-lg font-semibold">{TEXT_NO_CONSULTATIONS_TITLE}</h3>
+          <p className="text-muted-foreground mt-1 text-sm">{TEXT_NO_CONSULTATIONS_DESCRIPTION}</p>
 
           <Button
             onClick={() => {
@@ -174,13 +180,16 @@ export function StudentDashboard() {
             variant="outline"
           >
             <Plus className="h-4 w-4" />
-            Book Consultation
+            {TEXT_BOOK_CONSULTATION}
           </Button>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           {consultationList.map((consultation, index) => (
-            <div key={index} ref={index === consultationList.length - 1 ? lastItemRef : undefined}>
+            <div
+              key={`consultation-item-${index}`}
+              ref={index === consultationList.length - 1 ? lastItemRef : undefined}
+            >
               <ConsultationCard consultation={consultation} />
             </div>
           ))}

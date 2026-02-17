@@ -1,5 +1,6 @@
 'use server';
 
+import { ERROR_AN_ERROR_OCCURRED } from '@/constants/common';
 import { createClient } from '@/lib/supabase/server';
 
 export async function SignIn({ email, password }: { email: string; password: string }) {
@@ -19,7 +20,7 @@ export async function SignIn({ email, password }: { email: string; password: str
   } catch (error: unknown) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'An error occurred',
+      error: error instanceof Error ? error.message : ERROR_AN_ERROR_OCCURRED,
     };
   }
 }

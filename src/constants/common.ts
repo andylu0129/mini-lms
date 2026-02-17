@@ -1,0 +1,9 @@
+export const TEXT_APP_NAME = 'MiniLMS';
+export const TEXT_APP_TAGLINE = 'Student Consultation Portal';
+export const TEXT_BOOK_CONSULTATION = 'Book Consultation';
+export const TEXT_CANCEL = 'Cancel';
+export const TEXT_SIGN_OUT = 'Sign Out';
+export const ERROR_SOMETHING_WENT_WRONG = 'Something went wrong. Please try again.';
+export const ERROR_AN_ERROR_OCCURRED = 'An error occurred';
+export const ERROR_SIGN_IN_FAILED = 'Sign in failed. Please try again.';
+export const ERROR_SIGN_UP_FAILED = 'Sign up failed. Please try again.';

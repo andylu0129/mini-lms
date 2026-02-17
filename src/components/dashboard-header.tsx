@@ -1,6 +1,7 @@
 'use client';
 
 import { signOut } from '@/app/(protected)/dashboard/actions';
+import { TEXT_APP_NAME, TEXT_SIGN_OUT } from '@/constants/common';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
 import { BookOpen, LogOut } from 'lucide-react';
@@ -26,7 +27,7 @@ export function DashboardHeader() {
           <div className="bg-primary flex h-9 w-9 items-center justify-center rounded-lg">
             <BookOpen className="text-primary-foreground h-5 w-5" />
           </div>
-          <span className="font-display text-foreground text-lg font-bold">MiniLMS</span>
+          <span className="font-display text-foreground text-lg font-bold">{TEXT_APP_NAME}</span>
         </div>
         <div className="flex items-center gap-2">
           {!!user && (
@@ -41,7 +42,7 @@ export function DashboardHeader() {
             className="text-muted-foreground hover:text-foreground gap-2"
           >
             <LogOut className="size-4" />
-            <span className="inline">Sign Out</span>
+            <span className="inline">{TEXT_SIGN_OUT}</span>
           </Button>
         </div>
       </div>
