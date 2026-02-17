@@ -88,7 +88,7 @@ export function SignInForm() {
   };
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center px-4">
+    <div className="bg-background items-top flex min-h-screen justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center gap-2">
           <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-lg">

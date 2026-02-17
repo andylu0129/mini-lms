@@ -288,11 +288,12 @@ export function StudentDashboard() {
             <Button
               key={status}
               variant={statusFilter === status ? 'default' : 'outline'}
+              data-is-active={statusFilter === status}
               size="sm"
               onClick={() => {
                 setStatusFilter(status);
               }}
-              className="capitalize"
+              className="data-[is-active=true]:border-primary capitalize data-[is-active=true]:border"
             >
               {status}
             </Button>
