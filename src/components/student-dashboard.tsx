@@ -7,9 +7,11 @@ import { DashboardHeader } from '@/components/dashboard-header';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { ConsultationRowWithStatus } from '@/types/global';
 import { Plus, RefreshCw, Search, TriangleAlert } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function StudentDashboard() {
+  const router = useRouter();
   const user = { firstName: 'John', lastName: 'Doe' };
 
   const PAGE_SIZE = 5;
@@ -44,6 +46,10 @@ export function StudentDashboard() {
     }
   };
 
+  const handleBookConsultationClick = () => {
+    router.push('/dashboard/consultation-booking');
+  };
+
   const loadMore = useCallback(async () => {
     try {
       setIsLoadingMore(true);
@@ -61,11 +67,6 @@ export function StudentDashboard() {
       setIsLoadingMore(false);
     }
   }, [consultationList.length]);
-
-  // Keep the ref in sync with the latest loadMore instance.
-  useEffect(() => {
-    loadMoreRef.current = loadMore;
-  }, [loadMore]);
 
   // Callback ref attached to the last consultation card.
   // When that element scrolls into view, it triggers the next page fetch.
@@ -96,6 +97,11 @@ export function StudentDashboard() {
     [isLoadingMore, hasMoreItems],
   );
 
+  // Keep the ref in sync with the latest loadMore instance.
+  useEffect(() => {
+    loadMoreRef.current = loadMore;
+  }, [loadMore]);
+
   useEffect(() => {
     handleGetConsultationList();
   }, []);
@@ -113,7 +119,12 @@ export function StudentDashboard() {
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">Manage and track your consultation appointments</p>
           </div>
-          <Button onClick={() => {}} className="gap-2 self-start sm:self-auto">
+          <Button
+            onClick={() => {
+              handleBookConsultationClick();
+            }}
+            className="gap-2 self-start sm:self-auto"
+          >
             <Plus className="h-4 w-4" />
             Book Consultation
           </Button>
@@ -156,7 +167,13 @@ export function StudentDashboard() {
             <h3 className="font-display text-foreground text-lg font-semibold">No consultations found</h3>
             <p className="text-muted-foreground mt-1 text-sm">Book your first consultation to get started.</p>
 
-            <Button onClick={() => {}} className="mt-4 gap-2" variant="outline">
+            <Button
+              onClick={() => {
+                handleBookConsultationClick();
+              }}
+              className="mt-4 gap-2"
+              variant="outline"
+            >
               <Plus className="h-4 w-4" />
               Book Consultation
             </Button>

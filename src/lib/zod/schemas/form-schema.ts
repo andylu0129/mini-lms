@@ -40,6 +40,6 @@ export const signInFormSchema = z.object({
 export const consultationBookingFormSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  reason: z.string().min(1, 'Reason is required'),
-  scheduledAt: z.date().min(new Date(), 'Date must be in the future'),
+  reason: z.string().min(1, 'Reason for consultation is required'),
+  scheduledAt: z.date({ error: 'Date and time is required' }).min(new Date(), 'Date and time must be in the future'),
 });

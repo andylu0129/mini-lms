@@ -10,7 +10,8 @@ import { Textarea } from '@/lib/shadcn/components/ui/textarea';
 import { consultationBookingFormSchema } from '@/lib/zod/schemas/form-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, CalendarPlus } from 'lucide-react';
-import { useRouter } from 'next/router';
+import moment from 'moment';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
@@ -35,12 +36,12 @@ export function ConsultationBookingForm() {
   const resetForm = () => {
     reset();
     setError('');
-    setIsBookingSuccess(false);
   };
 
   function handleBookingSubmit(data: ConsultationBookingFormData) {
     setError('');
     setIsBookingSuccess(true);
+    console.log('data', data);
 
     setTimeout(() => {
       handleBack();
@@ -70,10 +71,10 @@ export function ConsultationBookingForm() {
 
       <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
         <button
-          onClick={(e) => {
+          onClick={() => {
             handleBack();
           }}
-          className="text-muted-foreground hover:text-foreground mb-6 flex items-center gap-2 text-sm transition-colors"
+          className="text-muted-foreground hover:text-foreground mb-6 flex cursor-pointer items-center gap-2 text-sm transition-colors"
           aria-label="Back to dashboard"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -141,7 +142,14 @@ export function ConsultationBookingForm() {
 
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="booking-datetime">Date and Time</Label>
-                  <Input id="booking-datetime" type="datetime-local" {...register('scheduledAt')} />
+                  <Input
+                    id="booking-datetime"
+                    type="datetime-local"
+                    min={moment().format('YYYY-MM-DDTHH:mm')}
+                    max={moment().add(1, 'year').format('YYYY-MM-DDTHH:mm')}
+                    className="[&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                    {...register('scheduledAt', { valueAsDate: true })}
+                  />
                   <p className="text-muted-foreground text-xs">Choose a date and time that works for you.</p>
                 </div>
 
