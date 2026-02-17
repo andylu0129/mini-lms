@@ -1,21 +1,26 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { clearAuthCookies, createClient, getAuthenticatedUserId } from '@/lib/supabase/server';
+import { ConsultationRow } from '@/types/global';
+import { rethrowRedirectError } from '@/utils/error-utils';
 import { getDerivedConsultationStatus } from '@/utils/status-utils';
 
-export async function getConsultationList(offset = 0, limit = 5) {
+export async function signOut() {
   try {
     const supabase = await createClient();
+    await supabase.auth.signOut();
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
+    await clearAuthCookies();
+  } catch (error) {
+    // Clear auth cookies even if sign-out fails to prevent auto-authentication.
+    await clearAuthCookies();
+  }
+}
 
-    if (!userId || userError) {
-      return { success: false, data: [], hasMore: false };
-    }
+export async function getConsultationList({ offset = 0, limit = 5 }: { offset: number; limit: number }) {
+  try {
+    const supabase = await createClient();
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('consultations')
@@ -35,6 +40,7 @@ export async function getConsultationList(offset = 0, limit = 5) {
     // If we got back exactly `limit` rows, there are likely more to fetch.
     return { success: true, data: consultationList || [], hasMore: data.length === limit };
   } catch (error) {
+    rethrowRedirectError(error);
     return {
       success: false,
       data: [],
@@ -43,61 +49,15 @@ export async function getConsultationList(offset = 0, limit = 5) {
   }
 }
 
-export async function createConsultation(formData: {
-  firstName: string;
-  lastName: string;
-  reason: string;
-  scheduledAt: Date;
-}) {
+export async function markConsultation(data: Pick<ConsultationRow, 'id' | 'is_completed'>) {
   try {
     const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
-
-    if (!userId || userError) {
-      return { success: false };
-    }
-
-    const { error } = await supabase.from('consultations').insert({
-      user_id: userId,
-      first_name: formData.firstName,
-      last_name: formData.lastName,
-      reason: formData.reason,
-      scheduled_at: formData.scheduledAt.toISOString(),
-    });
-
-    if (error) {
-      return { success: false };
-    }
-
-    return { success: true };
-  } catch (error) {
-    return { success: false };
-  }
-}
-
-export async function markConsultation(consultationId: string, isCompleted: boolean) {
-  try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
-
-    if (!userId || userError) {
-      return { success: false };
-    }
+    const userId = await getAuthenticatedUserId();
 
     const { error } = await supabase
       .from('consultations')
-      .update({ is_completed: isCompleted })
-      .eq('id', consultationId)
+      .update({ is_completed: data.is_completed })
+      .eq('id', data.id)
       .eq('user_id', userId);
 
     if (error) {
@@ -106,6 +66,7 @@ export async function markConsultation(consultationId: string, isCompleted: bool
 
     return { success: true };
   } catch (error) {
+    rethrowRedirectError(error);
     return { success: false };
   }
 }
