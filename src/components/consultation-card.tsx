@@ -15,16 +15,18 @@ import { ArrowRightCircle, Calendar, CheckCircle2, Circle, Clock, XCircle } from
 import moment from 'moment';
 
 const badgeMap: Record<ConsultationStatus, React.ReactNode> = {
-  upcoming: (
+  [STATUS_UPCOMING]: (
     <Badge variant="secondary" className="border-0 text-xs">
       {TEXT_STATUS_UPCOMING}
     </Badge>
   ),
-  pending: <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">{TEXT_STATUS_PENDING}</Badge>,
-  complete: (
+  [STATUS_PENDING]: (
+    <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">{TEXT_STATUS_PENDING}</Badge>
+  ),
+  [STATUS_COMPLETE]: (
     <Badge className="bg-primary/15 text-primary hover:bg-primary/20 border-0 text-xs">{TEXT_STATUS_COMPLETE}</Badge>
   ),
-  incomplete: (
+  [STATUS_INCOMPLETE]: (
     <Badge variant="destructive" className="border-0 text-xs">
       {TEXT_STATUS_INCOMPLETE}
     </Badge>
@@ -32,17 +34,17 @@ const badgeMap: Record<ConsultationStatus, React.ReactNode> = {
 };
 
 const iconMap: Record<ConsultationStatus, React.ReactNode> = {
-  upcoming: <ArrowRightCircle className="text-muted-foreground h-5 w-5" aria-hidden="true" />,
-  pending: <Circle className="text-accent h-5 w-5" aria-hidden="true" />,
-  complete: <CheckCircle2 className="text-primary h-5 w-5" aria-hidden="true" />,
-  incomplete: <XCircle className="text-destructive h-5 w-5" aria-hidden="true" />,
+  [STATUS_UPCOMING]: <ArrowRightCircle className="text-muted-foreground h-5 w-5" aria-hidden="true" />,
+  [STATUS_PENDING]: <Circle className="text-accent h-5 w-5" aria-hidden="true" />,
+  [STATUS_COMPLETE]: <CheckCircle2 className="text-primary h-5 w-5" aria-hidden="true" />,
+  [STATUS_INCOMPLETE]: <XCircle className="text-destructive h-5 w-5" aria-hidden="true" />,
 };
 
 const cardStyleMap: Record<ConsultationStatus, string> = {
-  upcoming: 'border-border bg-card',
-  pending: 'border-accent/30 bg-accent/5',
-  complete: 'border-primary/30 bg-primary/5',
-  incomplete: 'border-destructive/30 bg-destructive/5',
+  [STATUS_UPCOMING]: 'border-border bg-card',
+  [STATUS_PENDING]: 'border-accent/30 bg-accent/5',
+  [STATUS_COMPLETE]: 'border-primary/30 bg-primary/5',
+  [STATUS_INCOMPLETE]: 'border-destructive/30 bg-destructive/5',
 };
 
 export function ConsultationCard({

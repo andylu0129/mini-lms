@@ -14,15 +14,20 @@ import {
 import {
   ERROR_DESCRIPTION,
   ERROR_TITLE,
+  PAGINATION_SIZE,
+  SEARCH_DEBOUNCE_MS,
   TEXT_DASHBOARD_SUBTITLE,
   TEXT_MY_CONSULTATIONS,
   TEXT_NO_CONSULTATIONS_DESCRIPTION,
   TEXT_NO_CONSULTATIONS_TITLE,
   TEXT_RETRY,
+  TEXT_SEARCH_ARIA_LABEL,
+  TEXT_SEARCH_PLACEHOLDER,
   TEXT_WELCOME_PREFIX,
 } from '@/constants/dashboard';
+import { FIELD_FIRST_NAME } from '@/constants/fields';
 import { ROUTE_CONSULTATION_BOOKING } from '@/constants/routes';
-import { STATUS_COMPLETE, STATUS_INCOMPLETE } from '@/constants/status';
+import { STATUS_ALL, STATUS_COMPLETE, STATUS_INCOMPLETE, STATUS_PENDING, STATUS_UPCOMING } from '@/constants/status';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,9 +39,10 @@ import {
   AlertDialogTitle,
 } from '@/lib/shadcn/components/ui/alert-dialog';
 import { Button } from '@/lib/shadcn/components/ui/button';
+import { Input } from '@/lib/shadcn/components/ui/input';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
-import { ConsultationActionType, ConsultationRowWithStatus } from '@/types/global';
-import { Loader2, Plus, RefreshCw, Search, TriangleAlert } from 'lucide-react';
+import { ConsultationActionType, ConsultationFilterOption, ConsultationRowWithStatus } from '@/types/global';
+import { ListFilter, Loader2, Plus, RefreshCw, Search, TriangleAlert } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import DashboardStats from './dashboard-stats';
@@ -65,13 +71,15 @@ export function StudentDashboard() {
   const router = useRouter();
   const userDetails = useUserDetails();
 
-  const PAGINATION_SIZE = 10;
-
   const [consultationList, setConsultationList] = useState<ConsultationRowWithStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMoreItems, setHasMoreItems] = useState(false);
   const [shouldDisplayError, setShouldDisplayError] = useState(false);
+
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<ConsultationFilterOption>('all');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const [selectedConsultationData, setSelectedConsultationData] = useState<ConsultationRowWithStatus | null>(null);
   const [modalConfirmError, setModalConfirmError] = useState<string | null>(null);
@@ -89,7 +97,12 @@ export function StudentDashboard() {
       setIsLoading(true);
       setShouldDisplayError(false);
 
-      const { success, data, hasMore } = await getConsultationList({ offset: 0, limit: PAGINATION_SIZE });
+      const { success, data, hasMore } = await getConsultationList({
+        offset: 0,
+        limit: PAGINATION_SIZE,
+        search: debouncedSearch,
+        filter: statusFilter,
+      });
 
       setConsultationList(data);
       setHasMoreItems(hasMore);
@@ -160,7 +173,12 @@ export function StudentDashboard() {
       setIsLoadingMore(true);
 
       const offset = consultationList.length;
-      const { success, data, hasMore } = await getConsultationList({ offset: offset, limit: PAGINATION_SIZE });
+      const { success, data, hasMore } = await getConsultationList({
+        offset,
+        limit: PAGINATION_SIZE,
+        search: debouncedSearch,
+        filter: statusFilter,
+      });
 
       if (success) {
         setConsultationList((prev) => {
@@ -174,7 +192,7 @@ export function StudentDashboard() {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [consultationList.length]);
+  }, [consultationList.length, debouncedSearch, statusFilter]);
 
   // Callback ref attached to the last consultation card.
   // When that element scrolls into view, it triggers the next page fetch.
@@ -211,8 +229,18 @@ export function StudentDashboard() {
   }, [loadMoreConsultationItem]);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [search]);
+
+  useEffect(() => {
     handleGetConsultationList();
-  }, []);
+  }, [debouncedSearch, statusFilter]);
 
   const actionModalContent = getActionModalContent(modalActionType);
 
@@ -222,7 +250,7 @@ export function StudentDashboard() {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-foreground text-2xl font-bold text-balance sm:text-3xl">
-            {userDetails ? `${TEXT_WELCOME_PREFIX}${userDetails.firstName}` : TEXT_MY_CONSULTATIONS}
+            {userDetails ? `${TEXT_WELCOME_PREFIX}${userDetails[FIELD_FIRST_NAME]}` : TEXT_MY_CONSULTATIONS}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">{TEXT_DASHBOARD_SUBTITLE}</p>
         </div>
@@ -239,6 +267,38 @@ export function StudentDashboard() {
 
       {/* Stats */}
       <DashboardStats />
+
+      {/* Search and filters */}
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+          <Input
+            placeholder={TEXT_SEARCH_PLACEHOLDER}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+            className="pl-10"
+            aria-label={TEXT_SEARCH_ARIA_LABEL}
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <ListFilter className="text-muted-foreground h-4 w-4" aria-hidden="true" />
+          {[STATUS_ALL, STATUS_UPCOMING, STATUS_PENDING, STATUS_COMPLETE, STATUS_INCOMPLETE].map((status) => (
+            <Button
+              key={status}
+              variant={statusFilter === status ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                setStatusFilter(status);
+              }}
+              className="capitalize"
+            >
+              {status}
+            </Button>
+          ))}
+        </div>
+      </div>
 
       {/* Consultation list */}
       {isLoading ? (

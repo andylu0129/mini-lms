@@ -1,4 +1,6 @@
 import {
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
   VALIDATION_DATETIME_FUTURE,
   VALIDATION_DATETIME_REQUIRED,
   VALIDATION_FIRST_NAME_REQUIRED,
@@ -18,12 +20,9 @@ export const signUpFormSchema = z
     email: z.email(),
     password: z
       .string()
-      .min(8, VALIDATION_PASSWORD_MIN)
+      .min(PASSWORD_MIN_LENGTH, VALIDATION_PASSWORD_MIN)
       .max(64, VALIDATION_PASSWORD_MAX)
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).*$/,
-        VALIDATION_PASSWORD_COMPLEXITY,
-      ),
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).*$/, VALIDATION_PASSWORD_COMPLEXITY),
     confirmPassword: z.string(),
   })
   .refine(
@@ -40,12 +39,9 @@ export const signInFormSchema = z.object({
   email: z.email(),
   password: z
     .string()
-    .min(8, VALIDATION_PASSWORD_MIN)
-    .max(64, VALIDATION_PASSWORD_MAX)
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).*$/,
-      VALIDATION_PASSWORD_COMPLEXITY,
-    ),
+    .min(PASSWORD_MIN_LENGTH, VALIDATION_PASSWORD_MIN)
+    .max(PASSWORD_MAX_LENGTH, VALIDATION_PASSWORD_MAX)
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).*$/, VALIDATION_PASSWORD_COMPLEXITY),
 });
 
 export const consultationBookingFormSchema = z.object({

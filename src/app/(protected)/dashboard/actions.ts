@@ -21,15 +21,32 @@ export async function signOut() {
   }
 }
 
-export async function getConsultationList({ offset = 0, limit = 5 }: { offset: number; limit: number }) {
+export async function getConsultationList({
+  offset = 0,
+  limit = 5,
+  search,
+  filter,
+}: {
+  offset: number;
+  limit: number;
+  search?: string;
+  filter?: string;
+}) {
   try {
     const supabase = await createClient();
     const { userId } = await getVerifiedUserData();
 
-    const { data, error } = await supabase
-      .from(VIEW_CONSULTATIONS_WITH_STATUS)
-      .select('*')
-      .eq('user_id', userId)
+    let query = supabase.from(VIEW_CONSULTATIONS_WITH_STATUS).select('*').eq('user_id', userId);
+
+    if (search && search.trim().length > 0) {
+      query = query.ilike('reason', `%${search.trim()}%`);
+    }
+
+    if (filter && filter !== 'all') {
+      query = query.eq('status', filter);
+    }
+
+    const { data, error } = await query
       .order('scheduled_at', { ascending: false })
       .range(offset, offset + limit - 1); // .range() is inclusive on both ends, so subtract 1
 

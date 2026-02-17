@@ -2,6 +2,7 @@
 
 import { signOut } from '@/app/(protected)/dashboard/actions';
 import { BROADCAST_CHANNEL_AUTH, BROADCAST_MESSAGE_SIGN_OUT, TEXT_APP_NAME, TEXT_SIGN_OUT } from '@/constants/common';
+import { FIELD_FIRST_NAME, FIELD_LAST_NAME } from '@/constants/fields';
 import { ROUTE_SIGN_IN } from '@/constants/routes';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
@@ -33,7 +34,7 @@ export function DashboardHeader() {
         <div className="flex items-center gap-2">
           {!!user && (
             <span className="text-muted-foreground hidden text-sm sm:inline">
-              {user.firstName} {user.lastName}
+              {user[FIELD_FIRST_NAME]} {user[FIELD_LAST_NAME]}
             </span>
           )}
           <Button
