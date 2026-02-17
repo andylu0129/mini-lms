@@ -1,9 +1,16 @@
 'use client';
 
-import { getConsultationList } from '@/app/(protected)/dashboard/actions';
+import { getConsultationList, markConsultation } from '@/app/(protected)/dashboard/actions';
 import { ConsultationCard } from '@/components/consultation-card';
 import { ConsultationCardSkeleton } from '@/components/consultation-card-skeleton';
-import { TEXT_BOOK_CONSULTATION } from '@/constants/common';
+import { ERROR_SOMETHING_WENT_WRONG, TEXT_BOOK_CONSULTATION, TEXT_CANCEL } from '@/constants/common';
+import {
+  TEXT_CONFIRM,
+  TEXT_MARK_COMPLETE_DESCRIPTION,
+  TEXT_MARK_COMPLETE_TITLE,
+  TEXT_MARK_INCOMPLETE_DESCRIPTION,
+  TEXT_MARK_INCOMPLETE_TITLE,
+} from '@/constants/consultation-card';
 import {
   ERROR_DESCRIPTION,
   ERROR_TITLE,
@@ -15,18 +22,50 @@ import {
   TEXT_WELCOME_PREFIX,
 } from '@/constants/dashboard';
 import { ROUTE_CONSULTATION_BOOKING } from '@/constants/routes';
+import { STATUS_COMPLETE, STATUS_INCOMPLETE } from '@/constants/status';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/lib/shadcn/components/ui/alert-dialog';
 import { Button } from '@/lib/shadcn/components/ui/button';
 import { useUserDetails } from '@/lib/supabase/auth-provider';
-import { ConsultationRowWithStatus } from '@/types/global';
-import { Plus, RefreshCw, Search, TriangleAlert } from 'lucide-react';
+import { ConsultationActionType, ConsultationRowWithStatus } from '@/types/global';
+import { Loader2, Plus, RefreshCw, Search, TriangleAlert } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import DashboardStats from './dashboard-stats';
+
+const getActionModalContent = (actionType: ConsultationActionType | null) => {
+  switch (actionType) {
+    case STATUS_COMPLETE:
+      return {
+        title: TEXT_MARK_COMPLETE_TITLE,
+        description: TEXT_MARK_COMPLETE_DESCRIPTION,
+      };
+    case STATUS_INCOMPLETE:
+      return {
+        title: TEXT_MARK_INCOMPLETE_TITLE,
+        description: TEXT_MARK_INCOMPLETE_DESCRIPTION,
+      };
+    default:
+      return {
+        title: '',
+        description: '',
+      };
+  }
+};
 
 export function StudentDashboard() {
   const router = useRouter();
   const userDetails = useUserDetails();
 
-  const PAGE_SIZE = 5;
+  const PAGINATION_SIZE = 10;
 
   const [consultationList, setConsultationList] = useState<ConsultationRowWithStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,17 +73,23 @@ export function StudentDashboard() {
   const [hasMoreItems, setHasMoreItems] = useState(false);
   const [shouldDisplayError, setShouldDisplayError] = useState(false);
 
+  const [selectedConsultationData, setSelectedConsultationData] = useState<ConsultationRowWithStatus | null>(null);
+  const [modalConfirmError, setModalConfirmError] = useState<string | null>(null);
+  const [actionModalOpen, setActionModalOpen] = useState(false);
+  const [modalActionType, setModalActionType] = useState<ConsultationActionType | null>(null);
+  const [isModalConfirmLoading, setIsModalConfirmLoading] = useState(false);
+
   const observerRef = useRef<IntersectionObserver | null>(null);
   // Stable ref so the IntersectionObserver callback always calls the latest loadMore
   // without needing to re-create the observer on every render.
-  const loadMoreRef = useRef<() => void>(() => {});
+  const loadMoreConsultationItemRef = useRef<() => void>(() => {});
 
   const handleGetConsultationList = async () => {
     try {
       setIsLoading(true);
       setShouldDisplayError(false);
 
-      const { success, data, hasMore } = await getConsultationList({ offset: 0, limit: PAGE_SIZE });
+      const { success, data, hasMore } = await getConsultationList({ offset: 0, limit: PAGINATION_SIZE });
 
       setConsultationList(data);
       setHasMoreItems(hasMore);
@@ -63,15 +108,64 @@ export function StudentDashboard() {
     router.push(ROUTE_CONSULTATION_BOOKING);
   };
 
-  const loadMore = useCallback(async () => {
+  const handleModalClose = () => {
+    setActionModalOpen(false);
+    setModalConfirmError(null);
+    setSelectedConsultationData(null);
+  };
+
+  const handleModalConfirm = async ({
+    consultationId,
+    actionType,
+  }: {
+    consultationId: ConsultationRowWithStatus['id'];
+    actionType: ConsultationActionType;
+  }) => {
+    setIsModalConfirmLoading(true);
+
+    let isCompleted = null;
+    switch (actionType) {
+      case STATUS_COMPLETE:
+        isCompleted = true;
+        break;
+      case STATUS_INCOMPLETE:
+        isCompleted = false;
+        break;
+    }
+
+    try {
+      const { success } = await markConsultation({ id: consultationId, is_completed: isCompleted });
+
+      if (success) {
+        setConsultationList((prev) => {
+          return prev.map((item) => {
+            return item.id === consultationId ? { ...item, status: actionType } : item;
+          });
+        });
+        setIsModalConfirmLoading(false);
+        handleModalClose();
+      } else {
+        setModalConfirmError(ERROR_SOMETHING_WENT_WRONG);
+      }
+    } catch (error) {
+      console.error('Error updating consultation status:', error);
+      setModalConfirmError(ERROR_SOMETHING_WENT_WRONG);
+    } finally {
+      setIsModalConfirmLoading(false);
+    }
+  };
+
+  const loadMoreConsultationItem = useCallback(async () => {
     try {
       setIsLoadingMore(true);
 
       const offset = consultationList.length;
-      const { success, data, hasMore } = await getConsultationList({ offset: offset, limit: PAGE_SIZE });
+      const { success, data, hasMore } = await getConsultationList({ offset: offset, limit: PAGINATION_SIZE });
 
       if (success) {
-        setConsultationList((prev) => [...prev, ...data]);
+        setConsultationList((prev) => {
+          return [...prev, ...data];
+        });
         setHasMoreItems(hasMore);
       }
     } catch (error) {
@@ -84,7 +178,7 @@ export function StudentDashboard() {
 
   // Callback ref attached to the last consultation card.
   // When that element scrolls into view, it triggers the next page fetch.
-  const lastItemRef = useCallback(
+  const lastConsultationItemRef = useCallback(
     (node: HTMLDivElement | null) => {
       // Don't set up a new observer while we're mid-fetch.
       if (isLoadingMore) {
@@ -99,7 +193,7 @@ export function StudentDashboard() {
       // Create a fresh observer.
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMoreItems) {
-          loadMoreRef.current();
+          loadMoreConsultationItemRef.current();
         }
       });
 
@@ -113,12 +207,14 @@ export function StudentDashboard() {
 
   // Keep the ref in sync with the latest loadMore instance.
   useEffect(() => {
-    loadMoreRef.current = loadMore;
-  }, [loadMore]);
+    loadMoreConsultationItemRef.current = loadMoreConsultationItem;
+  }, [loadMoreConsultationItem]);
 
   useEffect(() => {
     handleGetConsultationList();
   }, []);
+
+  const actionModalContent = getActionModalContent(modalActionType);
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -141,10 +237,13 @@ export function StudentDashboard() {
         </Button>
       </div>
 
+      {/* Stats */}
+      <DashboardStats />
+
       {/* Consultation list */}
       {isLoading ? (
         <div className="flex flex-col gap-3">
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: PAGINATION_SIZE }).map((_, i) => (
             <ConsultationCardSkeleton key={i} />
           ))}
         </div>
@@ -189,16 +288,70 @@ export function StudentDashboard() {
         <div className="flex flex-col gap-3">
           {consultationList.map((consultation, index) => (
             <div
-              key={`consultation-item-${index}`}
-              ref={index === consultationList.length - 1 ? lastItemRef : undefined}
+              key={`consultation-item-${consultation.id}`}
+              ref={index === consultationList.length - 1 ? lastConsultationItemRef : undefined}
             >
-              <ConsultationCard consultation={consultation} />
+              <ConsultationCard
+                consultation={consultation}
+                setActionModalOpen={setActionModalOpen}
+                setSelectedConsultationData={setSelectedConsultationData}
+                setModalActionType={setModalActionType}
+              />
             </div>
           ))}
           {!!isLoadingMore &&
-            Array.from({ length: PAGE_SIZE }).map((_, i) => <ConsultationCardSkeleton key={`loading-more-${i}`} />)}
+            Array.from({ length: PAGINATION_SIZE }).map((_, i) => (
+              <ConsultationCardSkeleton key={`loading-more-${i}`} />
+            ))}
         </div>
       )}
+
+      {/* Confirmation modal */}
+      <AlertDialog
+        open={actionModalOpen}
+        onOpenChange={(open) => {
+          setActionModalOpen(open);
+        }}
+      >
+        <AlertDialogContent
+          onOverlayClick={() => {
+            return !isModalConfirmLoading && setActionModalOpen(false);
+          }}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display">{actionModalContent.title}</AlertDialogTitle>
+            <AlertDialogDescription>{actionModalContent.description}</AlertDialogDescription>
+            {modalConfirmError && <p className="text-destructive text-sm">{modalConfirmError}</p>}
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              disabled={!actionModalOpen || isModalConfirmLoading}
+              onClick={(e) => {
+                e.preventDefault();
+                if (!actionModalOpen || isModalConfirmLoading) {
+                  return;
+                }
+                handleModalClose();
+              }}
+            >
+              {TEXT_CANCEL}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={!actionModalOpen || isModalConfirmLoading}
+              onClick={async (e) => {
+                e.preventDefault();
+                if (!actionModalOpen || !modalActionType || isModalConfirmLoading || !selectedConsultationData) {
+                  return;
+                }
+
+                handleModalConfirm({ consultationId: selectedConsultationData.id, actionType: modalActionType });
+              }}
+            >
+              {isModalConfirmLoading ? <Loader2 className="mx-4.75 h-4 w-4 animate-spin" /> : TEXT_CONFIRM}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
