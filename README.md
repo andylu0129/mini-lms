@@ -153,13 +153,15 @@ This project requires **Node.js v20**. It is recommend to use [nvm](https://gith
    brew install supabase/tap/supabase
    ```
 
-2. **Start Supabase at project level**
+2. **Ensure your terminal is inside the project directory before running the following commands**
+
+3. **Start Supabase**
 
    ```bash
    supabase start
    ```
 
-3. **Reset the database** (applies migrations and seed data if exist)
+4. **Reset the database** (applies migrations and seed data if exist)
 
    ```bash
    supabase db reset
