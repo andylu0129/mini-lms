@@ -6,7 +6,7 @@ export const DASHBOARD = {
   RETRY: 'Retry',
   NO_CONSULTATIONS: {
     TITLE: 'No consultations found',
-    DESCRIPTION: 'Book your first consultation to get started.',
+    DESCRIPTION: 'Book your consultation to get started.',
   },
   SEARCH: {
     DEBOUNCE_MS: 300,

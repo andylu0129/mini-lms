@@ -50,6 +50,7 @@ export function useConsultations(debouncedSearch: string, statusFilter: string) 
     }
   };
 
+  /* Lazy loading and pagination */
   const loadMore = useCallback(async () => {
     try {
       setIsLoadingMore(true);
@@ -106,6 +107,7 @@ export function useConsultations(debouncedSearch: string, statusFilter: string) 
     },
     [isLoadingMore, hasMore],
   );
+  /* End of lazy loading and pagination */
 
   useEffect(() => {
     fetchList();

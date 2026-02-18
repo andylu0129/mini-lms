@@ -113,16 +113,6 @@ export type Database = {
       }
     }
     Functions: {
-      get_consultation_counts: {
-        Args: { user_uuid: string }
-        Returns: {
-          complete_count: number
-          incomplete_count: number
-          pending_count: number
-          total_count: number
-          upcoming_count: number
-        }[]
-      }
       get_consultation_counts_by_status: {
         Args: { user_id: string }
         Returns: {
