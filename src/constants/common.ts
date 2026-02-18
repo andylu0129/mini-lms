@@ -8,6 +8,7 @@ export const ERRORS = {
   SIGN_IN_FAILED: 'Sign in failed. Please try again.',
   SIGN_UP_FAILED: 'Sign up failed. Please try again.',
   SOMETHING_WENT_WRONG: 'Something went wrong. Please try again.',
+  CODE_USER_EXISTS: 'user_already_exists',
 } as const;
 
 export const BROADCAST = {
