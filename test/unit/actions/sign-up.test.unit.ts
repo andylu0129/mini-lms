@@ -70,12 +70,21 @@ describe('signUp', () => {
     );
   });
 
-  it('returns failure with Supabase error message', async () => {
-    mockAuthSignUp.mockResolvedValue({ error: { message: 'Email already registered' } });
+  it('returns success when user already exists to prevent account enumeration', async () => {
+    mockAuthSignUp.mockResolvedValue({ error: { code: ERRORS.CODE_USER_EXISTS } });
 
     const result = await signUp(validInput);
 
-    expect(result).toEqual({ success: false, error: 'Email already registered' });
+    expect(result).toEqual({ success: true, error: null });
+  });
+
+  it('returns failure with Supabase error message', async () => {
+    const mockErrorMessage = 'Mock error message';
+    mockAuthSignUp.mockResolvedValue({ error: { message: mockErrorMessage } });
+
+    const result = await signUp(validInput);
+
+    expect(result).toEqual({ success: false, error: mockErrorMessage });
   });
 
   it('returns failure with error message when an Error is thrown', async () => {

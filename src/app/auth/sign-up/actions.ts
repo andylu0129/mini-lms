@@ -33,7 +33,10 @@ export async function signUp({
     });
 
     if (error) {
-      return { success: false, error: error.message };
+      // Prevent account enumeration by returning a successful response for the user exists error.
+      return error.code === ERRORS.CODE_USER_EXISTS
+        ? { success: true, error: null }
+        : { success: false, error: error.message };
     }
 
     return { success: true, error: null };
