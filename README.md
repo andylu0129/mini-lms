@@ -424,4 +424,4 @@ E2E tests are written with **Cypress**.
 
 ## Deployed Version
 
-[https://placeholder-url.com]()
+[Project URL](https://mini-mp25wqbh8-andylu0129s-projects.vercel.app/)
