@@ -16,10 +16,14 @@ const badgeMap: Record<ConsultationStatus, React.ReactNode> = {
     </Badge>
   ),
   [STATUS.PENDING]: (
-    <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">{CONSULTATION_CARD.STATUS_TEXT.PENDING}</Badge>
+    <Badge className="bg-accent/20 text-accent-foreground border-0 text-xs">
+      {CONSULTATION_CARD.STATUS_TEXT.PENDING}
+    </Badge>
   ),
   [STATUS.COMPLETE]: (
-    <Badge className="bg-primary/15 text-primary hover:bg-primary/20 border-0 text-xs">{CONSULTATION_CARD.STATUS_TEXT.COMPLETE}</Badge>
+    <Badge className="bg-primary/15 text-primary hover:bg-primary/20 border-0 text-xs">
+      {CONSULTATION_CARD.STATUS_TEXT.COMPLETE}
+    </Badge>
   ),
   [STATUS.INCOMPLETE]: (
     <Badge variant="destructive" className="border-0 text-xs">
@@ -44,13 +48,13 @@ const cardStyleMap: Record<ConsultationStatus, string> = {
 
 export function ConsultationCard({
   consultation,
-  setActionModalOpen,
-  setSelectedConsultationData,
+  setModalOpen,
+  setSelectedConsultation,
   setModalActionType,
 }: {
   consultation: ConsultationRowWithStatus;
-  setActionModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedConsultationData: React.Dispatch<React.SetStateAction<ConsultationRowWithStatus | null>>;
+  setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedConsultation: React.Dispatch<React.SetStateAction<ConsultationRowWithStatus | null>>;
   setModalActionType: React.Dispatch<React.SetStateAction<ConsultationActionType | null>>;
 }) {
   const consultationStatus = consultation.status;
@@ -58,9 +62,9 @@ export function ConsultationCard({
   const formattedTime = moment(consultation.scheduled_at).format('hh:mm a'); // e.g., 08:45 pm
 
   const handleActionButtonClick = (actionType: ConsultationActionType) => {
-    setSelectedConsultationData(consultation);
+    setSelectedConsultation(consultation);
     setModalActionType(actionType);
-    setActionModalOpen(true);
+    setModalOpen(true);
   };
 
   return (
