@@ -44,7 +44,7 @@ export function ConsultationBookingForm() {
     setError('');
   };
 
-  async function handleBookingSubmit(data: ConsultationBookingFormData) {
+  const handleBookingSubmit = async (data: ConsultationBookingFormData) => {
     if (isFormSubmitting) {
       return;
     }
@@ -73,7 +73,7 @@ export function ConsultationBookingForm() {
     } finally {
       setIsFormSubmitting(false);
     }
-  }
+  };
 
   const handleDisplayError = (errorObject: typeof errors) => {
     if (errorObject[FIELDS.REASON]) {
@@ -183,7 +183,7 @@ export function ConsultationBookingForm() {
                   type="datetime-local"
                   min={moment().format('YYYY-MM-DDTHH:mm')}
                   max={moment().add(1, 'year').format('YYYY-MM-DDTHH:mm')}
-                  className="[&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                  className="w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                   {...register(FIELDS.SCHEDULED_AT, { valueAsDate: true })}
                 />
                 <p className="text-muted-foreground text-xs">{CONSULTATION_BOOKING.HINT.DATETIME}</p>
