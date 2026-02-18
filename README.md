@@ -5,6 +5,7 @@ A student-facing consultation portal that allows students to register, book cons
 ## Table of Contents
 
 - [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
 - [Prerequisites](#prerequisites)
   - [Node.js Setup](#nodejs-setup)
   - [Docker Setup](#docker-setup)
@@ -34,18 +35,35 @@ A student-facing consultation portal that allows students to register, book cons
 | ----------------- | ----------------------- | ------- | ----------------------------------------------------- |
 | Framework         | Next.js                 | v16     | Full-stack React framework with App Router            |
 | Language          | TypeScript              | v5      | Static typing across the entire codebase              |
-| Database          | Supabase (PostgreSQL)   | —       | Hosted PostgreSQL with built-in Auth and RLS          |
+| Database          | Supabase (PostgreSQL)   | -       | Hosted PostgreSQL with built-in Auth and RLS          |
 | Supabase Client   | `@supabase/ssr`         | v0.8    | SSR-compatible Supabase client for Next.js            |
 | Supabase Client   | `@supabase/supabase-js` | v2      | Core Supabase JS client                               |
 | Form Management   | React Hook Form         | v7      | Performant form state management                      |
 | Schema Validation | Zod                     | v4      | Runtime validation for forms and API boundaries       |
-| UI Components     | Shadcn/UI + Radix UI    | —       | Accessible, unstyled primitives with Tailwind styling |
+| UI Components     | Shadcn/UI + Radix UI    | -       | Accessible, unstyled primitives with Tailwind styling |
 | Styling           | Tailwind CSS            | v4      | Utility-first CSS                                     |
 | Date Handling     | Moment.js               | v2      | Date formatting and display                           |
 | Unit Testing      | Vitest                  | v4      | Fast unit test runner with Jest-compatible API        |
 | Coverage          | `@vitest/coverage-v8`   | v4      | V8-based code coverage                                |
 | E2E Testing       | Cypress                 | v15     | End-to-end browser testing                            |
 | Linting           | ESLint                  | v9      | Static analysis with Next.js config                   |
+
+---
+
+## Getting Started
+
+Clone the repository:
+
+```bash
+git clone https://github.com/andylu0129/mini-lms.git
+cd mini-lms
+```
+
+Install dependencies:
+
+```bash
+npm ci
+```
 
 ---
 
@@ -65,7 +83,7 @@ This project requires **Node.js v20**. It is recommend to use [nvm](https://gith
 
    **Windows:**
 
-   Download and install [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) from the latest release.
+   Download and install [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) from the latest release (nvm-setup.exe can be found scrolling down to Assets section).
 
 2. **Install and use Node.js v20**
 
@@ -135,53 +153,13 @@ This project requires **Node.js v20**. It is recommend to use [nvm](https://gith
    brew install supabase/tap/supabase
    ```
 
-2. **Start Supabase**
+2. **Start Supabase at project level**
 
    ```bash
    supabase start
    ```
 
-3. **Set up environment variables**
-
-   Copy `.env.example` to `.env.local`:
-
-   ```bash
-   cp .env.example .env.local
-   ```
-
-   Run `supabase status` to retrieve your local credentials:
-
-   ```bash
-   supabase status
-   ```
-
-   The output includes an **APIs** section and an **Authentication Keys** section. Copy the highlighted values into `.env.local`:
-
-   | Section             | Field         | Maps to                                |
-   | ------------------- | ------------- | -------------------------------------- |
-   | APIs                | `Project URL` | `NEXT_PUBLIC_SUPABASE_URL`             |
-   | Authentication Keys | `Publishable` | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |
-
-   Example `supabase status` output:
-
-   ```
-   🌐 APIs
-   ├────────────────┬─────────────────────────────────────┤
-   │ Project URL    │ http://127.0.0.1:54321              │
-
-   🔑 Authentication Keys
-   ├─────────────┬────────────────────────────────────────────────┤
-   │ Publishable │ sb_publishable_xxxxxxxxxxxxxxxxxxxx            │
-   ```
-
-   Your completed `.env.local` should look like:
-
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxx
-   ```
-
-4. **Reset the database** (applies migrations and seed data)
+3. **Reset the database** (applies migrations and seed data if exist)
 
    ```bash
    supabase db reset
@@ -191,35 +169,90 @@ This project requires **Node.js v20**. It is recommend to use [nvm](https://gith
 
 ### Using Docker Container
 
-1. Build and start the container:
+1. **Set up environment variables**
+
+   Run `supabase status` to retrieve your local credentials:
+
+   ```bash
+   supabase status
+   ```
+
+   The output includes an **Authentication Keys** section.
+   Create a copy of `.env.example` named `.env.local` and fill in the values below.
+
+   Example `supabase status` output:
+
+   ```
+   🔑 Authentication Keys
+   ├─────────────┬────────────────────────────────────────────────┤
+   │ Publishable │ sb_publishable_xxxxxxxxxxxxxxxxxxxx            │
+   ```
+
+   Your completed `.env.local` should look like:
+
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=http://host.docker.internal:54321
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxx
+   ```
+
+2. Build and start the container:
 
    ```bash
    docker compose up --build
    ```
 
-2. Access the app at [http://localhost:3000](http://localhost:3000)
+3. Access the app at [http://localhost:3000](http://localhost:3000)
 
 ### Without Docker Container
 
-1. Install dependencies:
+1.  **Set up environment variables**
 
-   ```bash
-   npm ci
-   ```
+    Run `supabase status` to retrieve your local credentials:
 
-2. Build the app:
+    ```bash
+    supabase status
+    ```
 
-   ```bash
-   npm run build
-   ```
+    The output includes an **APIs** section and an **Authentication Keys** section.
+    Create a copy of `.env.example` named `.env.local` and fill in the values below.
 
-3. Start the server:
+    | Section             | Field         | Maps to                                |
+    | ------------------- | ------------- | -------------------------------------- |
+    | APIs                | `Project URL` | `NEXT_PUBLIC_SUPABASE_URL`             |
+    | Authentication Keys | `Publishable` | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |
 
-   ```bash
-   npm start
-   ```
+    Example `supabase status` output:
 
-4. Access the app at [http://localhost:3000](http://localhost:3000)
+    ```
+    🌐 APIs
+    ├────────────────┬─────────────────────────────────────┤
+    │ Project URL    │ http://127.0.0.1:54321              │
+
+    🔑 Authentication Keys
+    ├─────────────┬────────────────────────────────────────────────┤
+    │ Publishable │ sb_publishable_xxxxxxxxxxxxxxxxxxxx            │
+    ```
+
+    Your completed `.env.local` should look like:
+
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxx
+    ```
+
+2.  Build the app:
+
+    ```bash
+    npm run build
+    ```
+
+3.  Start the server:
+
+    ```bash
+    npm start
+    ```
+
+4.  Access the app at [http://localhost:3000](http://localhost:3000)
 
 ## Stopping the Project
 
@@ -257,13 +290,7 @@ npm run test:coverage
 
 1. **Set up the Cypress environment file**
 
-   Copy the example file:
-
-   ```bash
-   cp cypress.env.json.example cypress.env.json
-   ```
-
-   Open `cypress.env.json` and fill in the credentials of an existing user in your local Supabase instance:
+   Create a copy of `cypress.env.json.example` named `cypress.env.json` and fill in the credentials of an existing user in your local Supabase instance:
 
    ```json
    {
@@ -390,7 +417,7 @@ E2E tests are written with **Cypress**.
 
 5. **Scheduled datetimes for new bookings are restricted to a future window of up to one year from today.** Allowing a past datetime would produce a `pending` consultation the moment it is created, which conflicts with the booking intent. The one-year upper bound prevents unreasonably far-future entries.
 
-6. **All user-facing strings — labels, error messages, validation copy, and status names — are centralised in `src/constants/`.** Keeping every magic string in a single location establishes a source of truth, eliminates scattered literals, and lays the groundwork for future internationalisation (i18n) without requiring a codebase-wide search-and-replace.
+6. **All user-facing strings, such as labels, error messages, validation copy, and status names, are centralised in `src/constants/`.** Keeping every magic string in a single location establishes a source of truth, eliminates scattered literals, and lays the groundwork for future internationalisation (i18n) without requiring a codebase-wide search-and-replace.
 
 7. **Passwords are required to be between 8 and 64 characters and meet complexity requirements (uppercase, lowercase, digit, special character).** The length range aligns with NIST SP 800-63B guidance, which treats length as the primary strength factor. The 64-character upper bound follows bcrypt convention (bcrypt truncates at 72 bytes; 64 characters provides a safe margin).
 
@@ -398,7 +425,7 @@ E2E tests are written with **Cypress**.
 
 9. **The authenticated user's ID is never sent from the client in request payloads.** All server actions derive the acting user's identity by calling `getVerifiedUserData()` server-side. This eliminates a class of spoofing attacks where a malicious client substitutes another user's ID in the request body. The `userId` is also never exposed in client-accessible state.
 
-10. **`supabase.auth.getUser()` is used for verification within server actions rather than `getClaims()`.** `getClaims()` reads the JWT locally without a network round-trip and is appropriate for the proxy middleware where performance is critical on every request. For server actions that perform mutations, `getUser()` is preferred as it validates the token against Supabase's Auth server, confirming the session has not been revoked even if the JWT has not yet expired. Note: while Supabase uses asymmetric signing by default in production, the local development environment uses symmetric keys — `getUser()` behaves consistently and correctly across both.
+10. **`supabase.auth.getUser()` is used for verification within server actions rather than `getClaims()`.** `getClaims()` reads the JWT locally without a network round-trip and is appropriate for the proxy middleware where performance is critical on every request. For server actions that perform mutations, `getUser()` is preferred as it validates the token against Supabase's Auth server, confirming the session has not been revoked even if the JWT has not yet expired. Note: while Supabase uses asymmetric signing by default in production, the local development environment uses symmetric keys, `getUser()` behaves consistently and correctly across both.
 
 11. **The consultation list uses infinite scroll rather than traditional page-based pagination.** A sentinel element (the last card in the list) is observed via the `IntersectionObserver` API; when it enters the viewport, the next page is fetched and appended. This provides a seamless, mobile-friendly experience without requiring explicit page controls.
 
