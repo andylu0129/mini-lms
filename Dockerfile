@@ -1,7 +1,7 @@
 ARG NODE_VERSION=20
 
 # Use node image for base image for all stages.
-FROM node:${NODE_VERSION}-alpine as base
+FROM node:${NODE_VERSION}-alpine AS base
 
 # Navigate to the app directory.
 WORKDIR /src/app

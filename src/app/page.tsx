@@ -1,9 +1,6 @@
-"use client";
+import { ROUTES } from '@/constants/routes';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <main className="min-h-screen w-full flex flex-col items-center ">
-      Home
-    </main>
-  );
+  redirect(ROUTES.SIGN_IN);
 }
