@@ -34,6 +34,7 @@ export function ConsultationActionModal({
   actionType,
   consultationData,
   handleConfirm,
+  handleClose,
   isLoading,
   error,
 }: {
@@ -42,6 +43,7 @@ export function ConsultationActionModal({
   actionType: ConsultationActionType | null;
   consultationData: ConsultationRowWithStatus | null;
   handleConfirm: (data: { consultationData: ConsultationRowWithStatus; actionType: ConsultationActionType }) => void;
+  handleClose: () => void;
   isLoading: boolean;
   error?: string | null;
 }) {
@@ -61,7 +63,18 @@ export function ConsultationActionModal({
           {error && <p className="text-destructive text-sm">{error}</p>}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>{COMMON_TEXT.CANCEL}</AlertDialogCancel>
+          <AlertDialogCancel
+            disabled={isLoading}
+            onClick={(e) => {
+              e.preventDefault();
+              if (isLoading) {
+                return;
+              }
+              handleClose();
+            }}
+          >
+            {COMMON_TEXT.CANCEL}
+          </AlertDialogCancel>
           <AlertDialogAction
             disabled={isLoading || !actionType || !consultationData}
             onClick={(e) => {

@@ -79,7 +79,7 @@ export function StudentDashboard() {
                 [actionType]: prev[actionType] + 1,
               };
         });
-        setModalOpen(false);
+        handleModalClose();
       } else {
         setModalError(ERRORS.SOMETHING_WENT_WRONG);
       }
@@ -88,6 +88,11 @@ export function StudentDashboard() {
     } finally {
       setModalLoading(false);
     }
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setModalError(null);
   };
 
   return (
@@ -219,6 +224,7 @@ export function StudentDashboard() {
         actionType={modalActionType}
         consultationData={selectedConsultation}
         handleConfirm={handleModalConfirm}
+        handleClose={handleModalClose}
         isLoading={modalLoading}
         error={modalError}
       />
