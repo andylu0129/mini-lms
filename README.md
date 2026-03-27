@@ -448,9 +448,3 @@ E2E tests are written with **Cypress**.
 - **Rate limiting on authentication endpoints.** Sign-in and sign-up server actions are currently unthrottled beyond Supabase's built-in limits. Adding application-level rate limiting (e.g., via an edge middleware or Supabase Edge Functions) would provide an additional layer of protection against brute-force attacks.
 
 - **Consultation cancellation.** Currently there is no DELETE RLS policy and no cancellation workflow. A soft-delete approach such as an `is_cancelled` flag and a corresponding status would allow students to retract bookings without permanently erasing the record.
-
----
-
-## Deployed Version
-
-[Project URL](https://mini-mp25wqbh8-andylu0129s-projects.vercel.app/)

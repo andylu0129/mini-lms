@@ -64,7 +64,8 @@ export function ConsultationActionModal({
           <AlertDialogCancel disabled={isLoading}>{COMMON_TEXT.CANCEL}</AlertDialogCancel>
           <AlertDialogAction
             disabled={isLoading || !actionType || !consultationData}
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               if (!isOpen || !actionType || isLoading || !consultationData) {
                 return;
               }
